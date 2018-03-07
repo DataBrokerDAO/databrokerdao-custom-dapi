@@ -5,7 +5,6 @@ const spreadsheet = require('./services/google/spreadsheet');
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
-const sleep = require('sleep');
 const Promise = require('bluebird');
 
 app.use(bodyParser.json());
