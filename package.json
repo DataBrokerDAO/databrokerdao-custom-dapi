@@ -24,7 +24,7 @@
     "web3": "^1.0.0-beta.30"
   },
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon src/server.js",
     "test": "NODE_ENV=test mocha --timeout 10000 **/tests/*.spec.js"
   },
   "devDependencies": {

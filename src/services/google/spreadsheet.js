@@ -10,12 +10,14 @@ async function publish(row) {
     await init();
   }
 
-  await sheet.addRow(row, function(error, result) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log(result);
-    }
+  return new Promise((resolve, reject) => {
+    sheet.addRow(row, function(error) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
   });
 }
 
@@ -29,7 +31,7 @@ function init() {
       },
       function getInfoAndWorksheets(step) {
         doc.getInfo(function(err, info) {
-          console.log(`'${info.title}' spreadsheet loaded`);
+          console.log(`Google Spreadsheet loaded: '${info.title}'`);
           sheet = info.worksheets[0];
           step();
         });
