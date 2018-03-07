@@ -2,19 +2,30 @@
   "name": "databrokerdao-custom-dapi",
   "version": "1.0.0",
   "main": "index.js",
-  "repository":
-    "https://github.com/DataBrokerDAO/databrokerdao-custom-dapi.git",
+  "repository": "https://github.com/DataBrokerDAO/databrokerdao-custom-dapi.git",
   "author": "Silke Van den Broeck - SettleMint",
   "license": "MIT",
   "dependencies": {
-    "@settlemint/lib-mongo": "^3.2.4",
+    "assert": "^1.4.1",
+    "bigi": "^1.4.2",
+    "buffer-xor": "^2.0.2",
+    "crypto": "^1.0.1",
     "dotenv": "^5.0.0",
+    "ecurve": "^1.0.6",
+    "ethereumjs-util": "^5.1.5",
     "express": "^4.16.2",
-    "mocha": "^5.0.1"
+    "google-spreadsheet": "^2.0.4",
+    "keccakjs": "^0.2.1",
+    "mocha": "^5.0.1",
+    "mongodb": "^3.0.4",
+    "rlp": "^2.0.0",
+    "secp256k1": "^3.5.0",
+    "truffle-contract": "^3.0.4",
+    "web3": "^1.0.0-beta.30"
   },
   "scripts": {
-    "start": "nodemon index.js",
-    "test": "NODE_ENV=test mocha --timeout 10000 **/*.spec.js"
+    "start": "nodemon server.js",
+    "test": "NODE_ENV=test mocha --timeout 10000 **/tests/*.spec.js"
   },
   "devDependencies": {
     "nodemon": "^1.15.1"
