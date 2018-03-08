@@ -11,18 +11,29 @@ app.use(bodyParser.json());
 
 app.post('/:sensorid/data', async (req, res, next) => {
   console.log(`Received data for sensor ${req.params.sensorid}`);
-
   let data = req.body;
   let purchases = await mongo.getPurchasesForSensorID(req.params.sensorid);
   await Promise.map(
     purchases,
     purchase => {
-      if (purchase.endtime < new Date() / 1000) {
-        return Promise.resolve();
-      }
+      return new Promise((resolve, reject) => {
+        if (purchase.endtime < new Date() / 1000) {
+          resolve();
+        }
 
-      data.purchaser = purchase.address;
-      return spreadsheet.publish(data);
+        // TEMP add purchaser to the data for demo purposes
+        data.purchaser = purchase.address;
+
+        spreadsheet
+          .publish(data)
+          .then(() => {
+            resolve();
+          })
+          .catch(error => {
+            console.log(`Error while publishing data ${error}`);
+            resolve();
+          });
+      });
     },
     { concurrency: 4 }
   );

@@ -11,17 +11,22 @@ async function publish(row) {
   }
 
   return new Promise((resolve, reject) => {
-    sheet.addRow(row, function(error) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
+    try {
+      sheet.addRow(row, function(error) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    } catch (error) {
+      resolve();
+    }
   });
 }
 
 function init() {
+  console.log('Init spreadsheet');
   const doc = new Spreadsheet(process.env.GOOGLE_SPREADSHEET_ID);
   async.series(
     [
