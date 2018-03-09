@@ -3,17 +3,27 @@ const async = require('async');
 
 require('dotenv').load();
 
-let sheet;
+const creds = {
+  luftdaten: 'databrokerdao-datagateway-luftdaten-creds.json',
+  citybikenyc: 'databrokerdao-datagateway-citybikenyc-creds.json'
+};
 
-async function publish(row) {
-  if (typeof sheet === 'undefined') {
-    await init();
+const sheetids = {
+  luftdaten: '1fkoVd6iXhN4MuboSTU7qj9WizuzyoywP5Y076243Ddk',
+  citybikenyc: '1lkHpM2udJu_3FhS1u_55SNztY5v9qSi0AFaF05ztgvo'
+};
+
+let sheets = {};
+
+async function publish(sheet, row) {
+  if (typeof sheets[sheet] === 'undefined') {
+    await init(sheet);
   }
 
   return new Promise((resolve, reject) => {
     try {
       console.log(JSON.stringify(row));
-      sheet.addRow(row, function(error) {
+      sheets[sheet].addRow(row, function(error) {
         if (error) {
           reject(error);
         } else {
@@ -26,19 +36,20 @@ async function publish(row) {
   });
 }
 
-function init() {
-  console.log('Init spreadsheet');
-  const doc = new Spreadsheet(process.env.GOOGLE_SPREADSHEET_ID);
+function init(sheet) {
+  console.log(`Init spreadsheet ${sheet}`);
+  const doc = new Spreadsheet(sheetids[sheet]);
+
   async.series(
     [
       function setAuth(step) {
-        const creds = require('./../../../creds/databrokerdao-datagateway-creds.json');
-        doc.useServiceAccountAuth(creds, step);
+        const credentials = require(`./../../../creds/${creds[sheet]}`);
+        doc.useServiceAccountAuth(credentials, step);
       },
       function getInfoAndWorksheets(step) {
         doc.getInfo(function(err, info) {
           console.log(`Google Spreadsheet loaded: '${info.title}'`);
-          sheet = info.worksheets[0];
+          sheets[sheet] = info.worksheets[0];
           step();
         });
       }
@@ -51,7 +62,8 @@ function init() {
   );
 }
 
-init();
+init('luftdaten');
+init('citybikenyc');
 
 module.exports = {
   publish

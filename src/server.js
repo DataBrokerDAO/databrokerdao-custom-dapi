@@ -6,11 +6,15 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 const Promise = require('bluebird');
+const delimiter = '!#!';
 
 app.use(bodyParser.json());
 
 app.post('/:sensorid/data', async (req, res, next) => {
   console.log(`Received data for sensor ${req.params.sensorid}`);
+
+  let parts = req.params.sensorid.split(delimiter);
+  let source = parts[0];
 
   let purchasers = [];
   let purchases = await mongo.getPurchasesForSensorID(req.params.sensorid);
@@ -22,15 +26,16 @@ app.post('/:sensorid/data', async (req, res, next) => {
 
   let data = req.body;
   data.purchaser = purchasers.join(',');
+  data.dbdaosensorid = req.params.sensorid;
 
   await new Promise((resolve, reject) => {
     spreadsheet
-      .publish(data)
+      .publish(source, data)
       .then(() => {
         resolve();
       })
       .catch(error => {
-        console.log(`Error while publishing data ${error}`);
+        console.log(`Error while publishing ${source} data ${error}`);
         resolve();
       });
   });
