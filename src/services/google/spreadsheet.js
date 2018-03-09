@@ -1,4 +1,4 @@
-const Spreadsheet = require('google-spreadsheet');
+const Spreadsheet = require('./index');
 const async = require('async');
 
 require('dotenv').load();
@@ -12,6 +12,7 @@ async function publish(row) {
 
   return new Promise((resolve, reject) => {
     try {
+      console.log(JSON.stringify(row));
       sheet.addRow(row, function(error) {
         if (error) {
           reject(error);
