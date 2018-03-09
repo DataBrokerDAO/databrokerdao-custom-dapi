@@ -9,6 +9,9 @@ Every purchaser gets a new entry.
 
 ## Setup
 In the .env file you'll find all config variables required to set this up.
+Please note that the google creds json should be added in the creds directory, with hardcoded
+filename "databrokerdao-datagateway-creds.json"
+
 ```
 ATLAS_CONNECTION_STRING=              [enter your connection string]
 ATLAS_DATABASE_NAME=      	      [enter your desired mongo database]
