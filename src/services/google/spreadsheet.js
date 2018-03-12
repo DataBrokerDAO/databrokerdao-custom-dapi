@@ -9,7 +9,7 @@ const creds = {
 };
 
 const sheetids = {
-  luftdaten: '1fkoVd6iXhN4MuboSTU7qj9WizuzyoywP5Y076243Ddk',
+  luftdaten: '1Vxd68I6NRTL2wZ2ZEzgSzIdNO_p6EMCWs7u4265SWdE',
   citybikenyc: '1lkHpM2udJu_3FhS1u_55SNztY5v9qSi0AFaF05ztgvo'
 };
 
