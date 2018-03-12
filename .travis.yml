@@ -8,6 +8,11 @@ cache:
 node_js:
   - '9'
 
+before_install:
+  - docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}";
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
+
 after_success:
   - npm run travis-deploy-once "npm run semantic-release"
   - if ([ $TRAVIS_PULL_REQUEST == "false" ]); then
