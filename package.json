@@ -1,6 +1,6 @@
 {
-  "name": "databrokerdao-custom-dapi",
-  "version": "1.0.0",
+  "name": "@settlemint/databrokerdao-custom-dapi",
+  "version": "0.0.0-development",
   "main": "index.js",
   "repository": "https://github.com/DataBrokerDAO/databrokerdao-custom-dapi.git",
   "author": "Silke Van den Broeck - SettleMint",
@@ -28,10 +28,17 @@
     "request": "^2.69.0"
   },
   "scripts": {
-    "start": "nodemon src/server.js",
-    "test": "NODE_ENV=test mocha --timeout 10000 **/tests/*.spec.js"
+    "start": "node --trace-warnings src/server.js",
+    "start-debug": "node --trace-warnings --inspect=0.0.0.0:9230 --preserve-symlinks src/server.js",
+    "start-debug-break": "node --trace-warnings --inspect-brk=0.0.0.0:9230 --preserve-symlinks src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "exit 0",
+    "semantic-release": "semantic-release",
+    "travis-deploy-once": "travis-deploy-once"
   },
   "devDependencies": {
-    "nodemon": "^1.15.1"
+    "nodemon": "^1.15.1",
+    "semantic-release": "^15.0.2",
+    "travis-deploy-once": "^4.4.0"
   }
 }
