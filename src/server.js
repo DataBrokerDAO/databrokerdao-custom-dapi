@@ -15,6 +15,9 @@ app.post('/:sensorid/data', async (req, res, next) => {
 
   let parts = req.params.sensorid.split(delimiter);
   let source = parts[0];
+  if (typeof source === 'undefined') {
+    return res.sendStatus(400);
+  }
 
   let purchasers = [];
   let purchases = await mongo.getPurchasesForSensorID(req.params.sensorid);
@@ -40,7 +43,7 @@ app.post('/:sensorid/data', async (req, res, next) => {
       });
   });
 
-  res.sendStatus(200);
+  return res.sendStatus(200);
 });
 
 function bootstrap() {
