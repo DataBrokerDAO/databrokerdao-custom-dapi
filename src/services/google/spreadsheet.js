@@ -9,8 +9,8 @@ const creds = {
 };
 
 const sheetids = {
-  luftdaten: '1Vxd68I6NRTL2wZ2ZEzgSzIdNO_p6EMCWs7u4265SWdE',
-  citybikenyc: '1lkHpM2udJu_3FhS1u_55SNztY5v9qSi0AFaF05ztgvo'
+  luftdaten: process.env.GOOGLE_SHEET_ID_LUFTDATEN,
+  citybikenyc: process.env.GOOGLE_SHEET_ID_CITYBIKENYC
 };
 
 let sheets = {};
