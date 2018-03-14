@@ -52,8 +52,10 @@ async function createCollection(collectionName) {
   return db.createCollection(collectionName);
 }
 
+init();
+
 module.exports = {
-  init,
+  getDb,
   getCollection,
   listCollections,
   createCollection
