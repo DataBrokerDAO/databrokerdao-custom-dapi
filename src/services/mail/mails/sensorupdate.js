@@ -8,57 +8,55 @@ const DELIMITER = '!#!';
 require('dotenv').config();
 
 async function send(sensorID, csvUrl) {
-  const emailFrom = 'Databroker DAO <dao@databroker.com>';
-  const subject = await getSubject(sensorID);
+  const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
+  const sensor = await mongo.getSensorForSensorID(sensorID);
+  const subject = await getSubject(sensor);
   const attachments = await getAttachments(csvUrl);
-  const emailTo = await getEmailTo(sensorID);
-  Promise.all(
-    emailTo,
-    emailAddress => {
-      const message = await getMessage(sensorID, emailTo[i]);
-      return mailer.send(emailFrom, emailTo, subject, message, attachments);
-    }
-  );
+  const emailAddresses = await getEmailAddresses(sensor);
+
+  for (let i=0; i< emailAddresses.length; i++) {
+    let emailTo = emailAddresses[i];
+    const message = getMessage(sensor, emailTo);
+    mailer.send(emailFrom, emailTo, subject, message, attachments);
+  }
 }
 
-async function getEmailTo(sensorID) {
-  const isExpired = purchase => {
+async function getEmailAddresses(sensor) {
+  const notExpired = purchase => {
     return purchase.endtime >= new Date() / 1000;
   };
 
   const isSubscribed = (purchase, sensorID) => {
-    return registry.isSubscribed(purhcase.email, sensorID);
+    return true;
+    return registry.isSubscribed(purchase.email, sensor.sensorid);
   };
 
   let emailTo = [];
-  return mongo.getPurchasesForSensorID(sensorID).then(purchases => {
+  await mongo.getPurchasesForSensorID(sensor.sensorid).then(purchases => {
     purchases.forEach(purchase => {
-      if (!isExpired(purchase) && isSubscribed(purchase, sensorID)) {
+      if (notExpired(purchase) && isSubscribed(purchase, sensor.sensorid)) {
         emailTo.push(purchase.email);
       }
     });
-    return emailTo;
   });
+
+  return emailTo;
 }
 
-function getSubject(sensorID) {
-  return mongo.getSensorForSensorID(sensorID).then(sensor => {
-    return `New readings from ${sensor.name}`;
-  });
+function getSubject(sensor) {
+  return `New readings from '${sensor.name}'`;
 }
 
-function getMessage(sensorID, emailAddress) {
-  return mongo.getSensorForSensorID(sensorID).then(sensor => {
-    const unsubscribeHash = Buffer.from(`${sensorID}${DELIMITER}${emailAddress}`).toString('base64');
-    const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/hash=${unsubscribeHash}`;
-    return `Please find enclosed the new readings from sensor ${sensor.name}\n Kind regards, the Databroker DAO team\n <a href="${unsubscribeUrl}">Unsubscribe</a>`;
-  });
+function getMessage(sensor, emailAddress) {
+  const unsubscribeHash = Buffer.from(`${sensor.sensorid}${DELIMITER}${emailAddress}`).toString('base64');
+  const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/hash=${unsubscribeHash}`;
+  return `Please find enclosed the new readings from sensor ${sensor.name}\n Kind regards, the Databroker DAO team\n <a href="${unsubscribeUrl}">Unsubscribe</a>`;
 }
 
 async function getAttachments(url) {
   return {
-    filename: getFilename(csvUrl),
-    content: getCsv(csvUrl)
+    filename: getFilename(url),
+    content: getCsv(url)
   };
 }
 

@@ -6,7 +6,7 @@ async function getSensorForSensorID(sensorID) {
 }
 
 async function getPurchasesForSensorID(sensorID) {
-  return [{ endtime: 2522076400, email: 'peterjan.brone@gmail.com' }];
+  return [{ endtime: 2522076400, email: 'peterjan.brone@gmail.com', sensorid: 'luftdaten!#!4138!#!SDS011' }];
   let collection = await client.getCollection('purchaseregistry-items');
   return collection.find({ sensorid: sensorID });
 }
