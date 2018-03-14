@@ -17,7 +17,7 @@ function createTransporter() {
   });
 }
 
-async function mail(emailFrom, emailTo, subject, message, attachments) {
+async function send(emailFrom, emailTo, subject, message, attachments) {
   if (typeof transporter === 'undefined') {
     transporter = await createTransporter();
   }
@@ -41,5 +41,5 @@ async function mail(emailFrom, emailTo, subject, message, attachments) {
 }
 
 module.exports = {
-  mail
+  send
 };

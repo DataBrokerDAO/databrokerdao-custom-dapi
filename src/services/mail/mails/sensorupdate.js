@@ -2,14 +2,23 @@ const mongo = require('./../../mongo/store');
 const rp = require('request-promise');
 const mailer = require('./../mailer');
 const registry = require('./../registry');
+const Promise = require('bluebird');
+const DELIMITER = '!#!';
+
+require('dotenv').config();
 
 async function send(sensorID, csvUrl) {
   const emailFrom = 'Databroker DAO <dao@databroker.com>';
-  const emailTo = await getEmailTo(sensorID);
   const subject = await getSubject(sensorID);
-  const message = await getMessage(sensorID);
   const attachments = await getAttachments(csvUrl);
-  return mailer.send(emailFrom, emailTo, subject, message, attachments);
+  const emailTo = await getEmailTo(sensorID);
+  Promise.all(
+    emailTo,
+    emailAddress => {
+      const message = await getMessage(sensorID, emailTo[i]);
+      return mailer.send(emailFrom, emailTo, subject, message, attachments);
+    }
+  );
 }
 
 async function getEmailTo(sensorID) {
@@ -21,13 +30,14 @@ async function getEmailTo(sensorID) {
     return registry.isSubscribed(purhcase.email, sensorID);
   };
 
+  let emailTo = [];
   return mongo.getPurchasesForSensorID(sensorID).then(purchases => {
     purchases.forEach(purchase => {
       if (!isExpired(purchase) && isSubscribed(purchase, sensorID)) {
-        purchasers.push(purchase.email);
+        emailTo.push(purchase.email);
       }
     });
-    return purchasers.join(', ');
+    return emailTo;
   });
 }
 
@@ -37,9 +47,11 @@ function getSubject(sensorID) {
   });
 }
 
-function getMessage(sensorID) {
+function getMessage(sensorID, emailAddress) {
   return mongo.getSensorForSensorID(sensorID).then(sensor => {
-    return `Please find enclosed the new readings from sensor ${sensor.name}\n Kind regards, the Databroker DAO team`;
+    const unsubscribeHash = Buffer.from(`${sensorID}${DELIMITER}${emailAddress}`).toString('base64');
+    const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/hash=${unsubscribeHash}`;
+    return `Please find enclosed the new readings from sensor ${sensor.name}\n Kind regards, the Databroker DAO team\n <a href="${unsubscribeUrl}">Unsubscribe</a>`;
   });
 }
 
