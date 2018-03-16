@@ -1,6 +1,16 @@
 const client = require('../mongo/client');
 
-async function getSensorForSensorID(sensorID) {``
+async function watch(collectionName, handler) {
+  const collection = await client.getCollection(collectionName);
+  collection.watch().on('change', handler);
+}
+
+async function getSensorForKey(key) {
+  let collection = await client.getCollection('streamregistry-items');
+  return collection.findOne({ key: key });
+}
+
+async function getSensorForSensorID(sensorID) {
   let collection = await client.getCollection('streamregistry-items');
   return collection.findOne({ sensorid: sensorID });
 }
@@ -12,6 +22,8 @@ async function getPurchasesForSensorID(sensorID) {
 }
 
 module.exports = {
+  watch,
+  getSensorForKey,
   getSensorForSensorID,
   getPurchasesForSensorID
 };

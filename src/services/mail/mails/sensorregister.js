@@ -10,9 +10,9 @@ async function send(sensor, recipient) {
     emailFrom,
     recipient,
     subject,
-    [],
+    [], // No attachments
     globalMergeVars,
-    [],
+    [], // No merge vars
     process.env.MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION
   );
 }

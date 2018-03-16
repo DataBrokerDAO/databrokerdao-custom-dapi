@@ -1,17 +1,49 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const validator = require('validator');
 const sensorupdate = require('./services/mail/mails/sensorupdate');
+const sensorregister = require('./services/mail/mails/sensorregister');
 const registry = require('./services/mail/registry');
-const DELIMITER = '||';
+const store = require('./services/mongo/store');
+
+const DELIMITER_HASH = '||';
+const DELIMITER_SENSOR = '!#!';
 
 require('dotenv').config();
 
 app.use(bodyParser.json());
 
 app.get('/unsubscribe', (req, res, next) => {
-  registry.unsubscribe(req.query.hash)
-  res.sendStatus(200);
+  const hash = new Buffer(req.query.hash, 'base64').toString('utf8');
+  const parts = hash.split(DELIMITER_HASH);
+  if (parts.length < 1) {
+    res.sendStatus(400);
+  }
+
+  // Validate user input - email
+  const email = parts[0];
+  if (!validator.isEmail(email)) {
+    res.sendStatus(400);
+  }
+
+  // Validate user input - sensorid
+  const sensorid = parts[1];
+  if (typeof sensorid !== 'undefined') {
+    const sensorIdParts = sensorid.split(DELIMITER_SENSOR);
+    if (!sensorIdParts.length === 3) {
+      res.sendStatus(400);
+    }
+  }
+
+  registry
+    .unsubscribe(email, sensorid)
+    .then(response => {
+      res.send('OK').status(200);
+    })
+    .catch(error => {
+      res.send(error).status(200);
+    });
 });
 
 app.post('/:sensorid/data', async (req, res, next) => {
@@ -25,7 +57,20 @@ app.post('/:sensorid/data', async (req, res, next) => {
 function bootstrap() {
   app.listen(process.env.MIDDLEWARE_PORT, server => {
     console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
-    registry.watch();
+
+    // Watch purchases and send a sensor registration mail when a new one gets inserted
+    store.watch('purchaseregistry-items', async data => {
+      if (data.operationType === 'insert') {
+        const purchase = data.fullDocument;
+        const sensor = await store.getSensorForKey(purchase.stream);
+        if (sensor) {
+          await registry.subscribe(sensor, purchase.email);
+          await sensorregister.send(sensor, purchase.email);
+        } else {
+          console.log(`Error could not find sensor for stream ${purchase.stream}`);
+        }
+      }
+    });
   });
 }
 

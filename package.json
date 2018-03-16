@@ -31,6 +31,7 @@
     "secp256k1": "^3.5.0",
     "to-csv": "github:jwerle/to-csv",
     "truffle-contract": "^3.0.4",
+    "validator": "^9.4.1",
     "web3": "^1.0.0-beta.30",
     "xml2js": "^0.4.19"
   },
