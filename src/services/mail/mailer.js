@@ -17,7 +17,7 @@ function createTransporter() {
   });
 }
 
-async function send(emailFrom, emailTo, subject, message, attachments) {
+async function send(emailFrom, emailTo, subject, attachments, globalMergeVars, mergeVars, templateSlug) {
   if (typeof transporter === 'undefined') {
     transporter = await createTransporter();
   }
@@ -27,8 +27,15 @@ async function send(emailFrom, emailTo, subject, message, attachments) {
       from: emailFrom,
       to: emailTo,
       subject: subject,
-      text: message,
-      attachments: attachments
+      mandrillOptions: {
+        template_name: templateSlug,
+        template_content: [], // Necessary for Mandrill legacy
+        message: {
+          global_merge_vars: globalMergeVars,
+          merge_vars: mergeVars,
+          attachments: attachments
+        }
+      }
     };
 
     transporter.sendMail(options, (error, info) => {

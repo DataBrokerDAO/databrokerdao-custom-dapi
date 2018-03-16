@@ -3,39 +3,15 @@ const app = express();
 const bodyParser = require('body-parser');
 const sensorupdate = require('./services/mail/mails/sensorupdate');
 const registry = require('./services/mail/registry');
+const DELIMITER = '||';
 
 require('dotenv').config();
 
 app.use(bodyParser.json());
 
-app.get('/debug', async (req, res, next) => {
-  const MongoQS = require('mongo-querystring');
-  const util = require('util');
-
-  const DEFAULT_OPTIONS = {
-    skip: 0,
-    limit: 25,
-    dir: -1,
-    sort: 'key'
-  };
-
-  const qs = new MongoQS({
-    custom: {
-      bbox: 'geo',
-      near: 'geo'
-    }
-  });
-
-  console.log(req.query);
-  let q = qs.parse(req.query);
-  console.log(util.inspect(q, false, null));
-  let c = await mongo.getCollection();
-  c.find();
-  res.sendStatus(200);
-});
-
 app.get('/unsubscribe', (req, res, next) => {
-  const hash = req.query.hash;
+  registry.unsubscribe(req.query.hash)
+  res.sendStatus(200);
 });
 
 app.post('/:sensorid/data', async (req, res, next) => {

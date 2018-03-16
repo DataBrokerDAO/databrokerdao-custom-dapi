@@ -1,6 +1,6 @@
 const client = require('../mongo/client');
 
-async function getSensorForSensorID(sensorID) {
+async function getSensorForSensorID(sensorID) {``
   let collection = await client.getCollection('streamregistry-items');
   return collection.findOne({ sensorid: sensorID });
 }

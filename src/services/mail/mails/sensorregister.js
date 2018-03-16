@@ -1,33 +1,31 @@
-const mongo = require('./services/mongo/store');
-const rp = require('request-promise');
 const mailer = require('./../mailer');
 
-async function send(sensorID, emailTo) {
-  const emailFrom = 'Databroker DAO <dao@databroker.com>';
-  const subject = await getSubject(sensorID);
-  const message = await getMessage(sensorID);
-  const attachments = await getAttachments(csvUrl);
-  return mailer.send(
+require('dotenv').config();
+
+async function send(sensor, recipient) {
+  const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
+  const subject = `Sensor Registration '${sensor.name}'`;
+  const globalMergeVars = getGlobalMergeVars(sensor);
+  mailer.send(
     emailFrom,
-    emailTo,
+    recipient,
     subject,
-    message,
-    attachments
+    [],
+    globalMergeVars,
+    [],
+    process.env.MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION
   );
 }
 
-function getSubject(sensorID) {
-  return mongo.getSensorForSensorID(sensorID).then(sensor => {
-    return `Registration for sensor ${sensor.name} was successful`;
-  });
-}
-
-function getMessage(sensorID) {
-  return mongo.getSensorForSensorID(sensorID).then(sensor => {
-    return `You have successfully registered to receive updates for sensor ${sensor.name}\n Kind regards, the Databroker DAO team`;
-  });
+function getGlobalMergeVars(sensor) {
+  return [
+    {
+      name: 'SENSOR_NAME',
+      content: sensor.name
+    }
+  ];
 }
 
 module.exports = {
   send
-}
+};
