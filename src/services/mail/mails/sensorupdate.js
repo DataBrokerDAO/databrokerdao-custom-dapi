@@ -1,12 +1,11 @@
 const mongo = require('./../../mongo/store');
-const rp = require('request-promise');
 const mailer = require('./../mailer');
 const registry = require('./../registry');
 const DELIMITER = '||';
 
 require('dotenv').config();
 
-async function send(sensorid, csvUrl) {
+async function send(sensorid, attachments) {
   const sensor = await mongo.getSensorForSensorId(sensorid);
   const recipients = await getRecipients(sensor);
   if (recipients.length === 0) {
@@ -16,7 +15,6 @@ async function send(sensorid, csvUrl) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const emailTo = recipients.join(',');
   const subject = await getSubject(sensor);
-  const attachments = await getAttachments(csvUrl);
   const globalMergeVars = getGlobalMergeVars(sensor);
   const mergeVars = getMergeVars(sensor, recipients);
   return mailer.send(
@@ -93,30 +91,6 @@ function getMergeVars(sensor, recipients) {
     });
   }
   return mergeVars;
-}
-
-async function getAttachments(url) {
-  let data = await getCsv(url);
-  data = data.replace(/;/g, ','); // Change delimiter so mail clients can parse it;
-  const content = Buffer.from(data).toString('base64');
-  return [
-    {
-      type: 'text/csv',
-      name: getFilename(url),
-      content: content
-    }
-  ];
-}
-
-function getFilename(url) {
-  const regexp = /\/\/.*\/(.*.csv)/g;
-  const match = regexp.exec(url);
-  const filename = match[1];
-  return filename;
-}
-
-function getCsv(url) {
-  return rp({ url: url });
 }
 
 module.exports = {
