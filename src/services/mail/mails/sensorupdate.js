@@ -2,7 +2,6 @@ const mongo = require('./../../mongo/store');
 const rp = require('request-promise');
 const mailer = require('./../mailer');
 const registry = require('./../registry');
-const Promise = require('bluebird');
 const DELIMITER = '||';
 
 require('dotenv').config();
