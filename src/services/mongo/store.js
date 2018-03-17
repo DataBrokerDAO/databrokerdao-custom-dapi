@@ -10,20 +10,20 @@ async function getSensorForKey(key) {
   return collection.findOne({ key: key });
 }
 
-async function getSensorForSensorID(sensorID) {
+async function getSensorForSensorId(sensorid) {
   let collection = await client.getCollection('streamregistry-items');
-  return collection.findOne({ sensorid: sensorID });
+  return collection.findOne({ sensorid: sensorid });
 }
 
-async function getPurchasesForSensorID(sensorID) {
-  return [{ endtime: 2522076400, email: 'peterjan.brone@gmail.com', sensorid: 'luftdaten!#!4138!#!SDS011' }];
+async function getPurchasesForSensorKey(sensorKey) {
   let collection = await client.getCollection('purchaseregistry-items');
-  return collection.find({ sensorid: sensorID });
+  let purchases = await collection.find({ stream: sensorKey });
+  return purchases.toArray();
 }
 
 module.exports = {
   watch,
   getSensorForKey,
-  getSensorForSensorID,
-  getPurchasesForSensorID
+  getSensorForSensorId,
+  getPurchasesForSensorKey
 };

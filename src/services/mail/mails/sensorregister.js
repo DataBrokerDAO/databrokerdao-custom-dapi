@@ -2,7 +2,7 @@ const mailer = require('./../mailer');
 
 require('dotenv').config();
 
-async function send(sensor, recipient) {
+async function send(recipient, sensor) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const subject = `Sensor Registration '${sensor.name}'`;
   const globalMergeVars = getGlobalMergeVars(sensor);

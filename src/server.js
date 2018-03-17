@@ -57,20 +57,29 @@ app.post('/:sensorid/data', async (req, res, next) => {
 function bootstrap() {
   app.listen(process.env.MIDDLEWARE_PORT, server => {
     console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
-
-    // Watch purchases and send a sensor registration mail when a new one gets inserted
-    store.watch('purchaseregistry-items', async data => {
+    store.watch('purchaseregistry-items', data => {
       if (data.operationType === 'insert') {
-        const purchase = data.fullDocument;
-        const sensor = await store.getSensorForKey(purchase.stream);
-        if (sensor) {
-          await registry.subscribe(sensor, purchase.email);
-          await sensorregister.send(sensor, purchase.email);
-        } else {
-          console.log(`Error could not find sensor for stream ${purchase.stream}`);
-        }
+        handlePurchase(data.fullDocument);
       }
     });
+  });
+}
+
+async function handlePurchase(purchase) {
+  const sensor = await store.getSensorForKey(purchase.stream);
+  if (!sensor) {
+    console.log(`Error: could not find sensor for stream ${purchase.stream}`);
+    return;
+  }
+
+  const subscribed = await registry.isSubscribed(purchase.email, sensor.sensorid);
+  if (!subscribed) {
+    console.log(`Notice: user already subscribed or unsubscribed manually`);
+    return;
+  }
+
+  registry.subscribe(purchase.email, sensor).then(subscription => {
+    sensorregister.send(subscription.email, sensor);
   });
 }
 

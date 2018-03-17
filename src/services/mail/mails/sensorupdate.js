@@ -6,16 +6,20 @@ const DELIMITER = '||';
 
 require('dotenv').config();
 
-async function send(sensorID, csvUrl) {
-  const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
-  const sensor = await mongo.getSensorForSensorID(sensorID);
+async function send(sensorid, csvUrl) {
+  const sensor = await mongo.getSensorForSensorId(sensorid);
   const recipients = await getRecipients(sensor);
+  if (recipients.length === 0) {
+    return Promise.resolve();
+  }
+
+  const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const emailTo = recipients.join(',');
   const subject = await getSubject(sensor);
   const attachments = await getAttachments(csvUrl);
   const globalMergeVars = getGlobalMergeVars(sensor);
   const mergeVars = getMergeVars(sensor, recipients);
-  mailer.send(
+  return mailer.send(
     emailFrom,
     emailTo,
     subject,
@@ -31,18 +35,17 @@ async function getRecipients(sensor) {
     return purchase.endtime >= new Date() / 1000;
   };
 
-  const isSubscribed = (purchase, sensorID) => {
-    return registry.isSubscribed(purchase.email, sensor.sensorid);
+  const isSubscribed = (purchase, sensorid) => {
+    return registry.isSubscribed(purchase.email, sensorid);
   };
 
   let emailTo = [];
-  await mongo.getPurchasesForSensorID(sensor.sensorid).then(purchases => {
-    purchases.forEach(purchase => {
-      if (notExpired(purchase) && isSubscribed(purchase, sensor.sensorid)) {
-        emailTo.push(purchase.email);
-      }
-    });
-  });
+  let purchases = await mongo.getPurchasesForSensorKey(sensor.key);
+  for (let i = 0; i < purchases.length; i++) {
+    if (notExpired(purchases[i]) && isSubscribed(purchases[i], sensor.sensorid)) {
+      emailTo.push(purchases[i].email);
+    }
+  }
 
   return emailTo;
 }
@@ -51,14 +54,14 @@ function getSubject(sensor) {
   return `New readings from '${sensor.name}'`;
 }
 
-function getUnsubscribeSingleUrl(sensor, emailAddress) {
-  const unsubscribeHash = Buffer.from(`${emailAddress}${DELIMITER}${sensor.sensorid}`).toString('base64');
+function getUnsubscribeSingleUrl(sensor, email) {
+  const unsubscribeHash = Buffer.from(`${email}${DELIMITER}${sensor.sensorid}`).toString('base64');
   const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }
 
-function getUnsubscribeAllUrl(emailAddress) {
-  const unsubscribeHash = Buffer.from(emailAddress).toString('base64');
+function getUnsubscribeAllUrl(email) {
+  const unsubscribeHash = Buffer.from(email).toString('base64');
   const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }
@@ -83,7 +86,7 @@ function getMergeVars(sensor, recipients) {
           content: getUnsubscribeSingleUrl(sensor, recipients[i])
         },
         {
-          name: 'SENSOR_UNSUBSCRIBE_URL',
+          name: 'SENSOR_UNSUBSCRIBE_ALL',
           content: getUnsubscribeAllUrl(recipients[i])
         }
       ]
