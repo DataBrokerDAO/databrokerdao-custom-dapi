@@ -15,8 +15,12 @@ Please note that the google creds json should be added in the creds directory, w
 filename "databrokerdao-datagateway-creds.json".
 
 ```
-ATLAS_CONNECTION_STRING=              [enter your connection string]
-ATLAS_DATABASE_NAME=                  [enter your desired mongo database]
-MIDDLEWARE_PORT=                      [can be anything]
-NODE_ENV=                             [debug|production, note that cronjobs are env. dependant]
+ATLAS_CONNECTION_STRING=                   [enter your connection string]
+ATLAS_DATABASE_NAME=                       [enter your desired mongo database]
+MIDDLEWARE_URL=                            [url behind which this middleware is running]
+MIDDLEWARE_PORT=                           [port on which this middleware is running]
+MANDRILL_API_KEY                           [your mandrill api key]
+MANDRILL_TEMPLATE_SLUG_SENSOR_UPDATE       [slug for the sensor update mandrill template]
+MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION [slug for the sensor registration mandrill template]
+NODE_ENV=                                  [debug|production]
 ```
