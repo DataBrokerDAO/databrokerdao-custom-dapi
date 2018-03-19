@@ -57,6 +57,13 @@ app.post('/:sensorid/data', async (req, res, next) => {
     return res.sendStatus(400);
   }
 
+  // Return early if there are no purchases
+  const sensor = await store.getSensorForSensorId(sensorID);
+  const purchases = await store.getPurchasesForSensorKey(sensor.key);
+  if (purchases.length === 0) {
+    return res.sendStatus(200);
+  }
+
   let attachments;
   if (typeof sensorCsvUrl !== 'undefined') {
     let data = await rp({ url: sensorCsvUrl });
@@ -86,7 +93,7 @@ app.post('/:sensorid/data', async (req, res, next) => {
     ];
   }
 
-  await sensorupdate.send(sensorID, attachments);
+  await sensorupdate.send(sensor, attachments);
   return res.sendStatus(200);
 });
 

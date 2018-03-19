@@ -5,8 +5,7 @@ const DELIMITER = '||';
 
 require('dotenv').config();
 
-async function send(sensorid, attachments) {
-  const sensor = await mongo.getSensorForSensorId(sensorid);
+async function send(sensor, attachments) {
   const recipients = await getRecipients(sensor);
   if (recipients.length === 0) {
     return Promise.resolve();
