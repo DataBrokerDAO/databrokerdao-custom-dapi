@@ -59,6 +59,11 @@ app.post('/:sensorid/data', async (req, res, next) => {
 
   // Return early if there are no purchases
   const sensor = await store.getSensorForSensorId(sensorID);
+  if (!sensor) {
+    console.log(`Could not find sensor ${sensorID}, possible race condition`);
+    return res.sendStatus(404);
+  }
+
   const purchases = await store.getPurchasesForSensorKey(sensor.key);
   if (purchases.length === 0) {
     return res.sendStatus(200);
