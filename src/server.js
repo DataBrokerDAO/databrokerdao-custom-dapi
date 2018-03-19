@@ -15,6 +15,10 @@ require('dotenv').config();
 
 app.use(bodyParser.json());
 
+app.get('/debug', (req, res, next) => {
+  res.send('Running').status(200);
+});
+
 app.get('/unsubscribe', (req, res, next) => {
   const hash = new Buffer(req.query.hash, 'base64').toString('utf8');
   const parts = hash.split(DELIMITER_HASH);
