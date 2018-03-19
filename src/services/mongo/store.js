@@ -1,16 +1,29 @@
 const client = require('../mongo/client');
 
-async function getPurchasesForSensorID(sensorID) {
-  return [{endtime: 2522076400, address: '0x8155153b2d5372ccd895b899b8c8a51ae18e800db286fac44eb2e8bf52feca0f'}];
-  let collection = await client.getCollection('purchaseregistry-items');
-  return collection.find({ sensorid: sensorID });
+async function watch(collectionName, handler) {
+  const collection = await client.getCollection(collectionName);
+  collection.watch().on('change', handler);
 }
 
-async function triggerConnection() {
-  return client.getCollection('purchaseregistry-items');
+async function getSensorForKey(key) {
+  let collection = await client.getCollection('streamregistry-items');
+  return collection.findOne({ key: key });
+}
+
+async function getSensorForSensorId(sensorid) {
+  let collection = await client.getCollection('streamregistry-items');
+  return collection.findOne({ sensorid: sensorid });
+}
+
+async function getPurchasesForSensorKey(sensorKey) {
+  let collection = await client.getCollection('purchaseregistry-items');
+  let purchases = await collection.find({ stream: sensorKey });
+  return purchases.toArray();
 }
 
 module.exports = {
-  getPurchasesForSensorID,
-  triggerConnection
+  watch,
+  getSensorForKey,
+  getSensorForSensorId,
+  getPurchasesForSensorKey
 };
