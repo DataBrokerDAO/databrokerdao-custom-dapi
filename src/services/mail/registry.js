@@ -2,11 +2,11 @@ const mongo = require('./../mongo/client');
 
 require('dotenv').config();
 
-async function subscribe(email, sensor) {
+async function subscribe(email, sensorid) {
   const collection = await mongo.getCollection('mailregistry');
   const subscribtion = await collection.insert({
     email: email,
-    sensorid: sensor.sensorid,
+    sensorid: sensorid,
     status: 'subscribed'
   });
   return subscribtion;

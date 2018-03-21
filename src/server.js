@@ -132,7 +132,7 @@ async function handlePurchase(purchase) {
     return;
   }
 
-  registry.subscribe(purchase.email, sensor).then(subscription => {
+  registry.subscribe(purchase.email, sensor.sensorid).then(subscription => {
     sensorregister.send(subscription.email, sensor);
   });
 }
