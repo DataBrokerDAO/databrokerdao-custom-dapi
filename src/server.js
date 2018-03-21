@@ -7,6 +7,7 @@ const sensorregister = require('./services/mail/mails/sensorregister');
 const registry = require('./services/mail/registry');
 const store = require('./services/mongo/store');
 const rp = require('request-promise');
+const rtrim = require('rtrim');
 
 const DELIMITER_HASH = '||';
 const DELIMITER_SENSOR = '!#!';
@@ -44,7 +45,8 @@ app.get('/unsubscribe', (req, res, next) => {
   registry
     .unsubscribe(email, sensorid)
     .then(response => {
-      res.send('OK').status(200);
+      let unsubscribedUrl = rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
+      res.redirect(unsubscribedUrl);
     })
     .catch(error => {
       res.send(error).status(200);

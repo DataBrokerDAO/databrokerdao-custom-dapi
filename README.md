@@ -22,5 +22,6 @@ MIDDLEWARE_PORT=                           [port on which this middleware is run
 MANDRILL_API_KEY                           [your mandrill api key]
 MANDRILL_TEMPLATE_SLUG_SENSOR_UPDATE       [slug for the sensor update mandrill template]
 MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION [slug for the sensor registration mandrill template]
+DAPP_BASE_URL                              [url of the dapp (need it for /unsubscribed)]
 NODE_ENV=                                  [debug|production]
 ```
