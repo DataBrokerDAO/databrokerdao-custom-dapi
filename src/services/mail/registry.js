@@ -50,7 +50,7 @@ async function isSubscribed(email, sensorid) {
   const record = await collection.findOne({
     email: email,
     sensorid: sensorid,
-    status: 'active'
+    status: 'subscribed'
   });
   return typeof record !== 'undefined' && record !== null;
 }

@@ -127,8 +127,8 @@ async function handlePurchase(purchase) {
   }
 
   const subscribed = await registry.isSubscribed(purchase.email, sensor.sensorid);
-  if (!subscribed) {
-    console.log(`Notice: user already subscribed or unsubscribed manually`);
+  if (subscribed) {
+    console.log(`Notice: user already subscribed`);
     return;
   }
 
