@@ -4,12 +4,13 @@ require('dotenv').config();
 
 async function subscribe(email, sensorid) {
   const collection = await mongo.getCollection('mailregistry');
-  const subscribtion = await collection.insert({
+  const subscription = {
     email: email,
     sensorid: sensorid,
     status: 'subscribed'
-  });
-  return subscribtion;
+  };
+  await collection.insert(subscription);
+  return subscription;
 }
 
 async function unsubscribe(email, sensorid) {
