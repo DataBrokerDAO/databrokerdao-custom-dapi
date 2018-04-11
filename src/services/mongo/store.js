@@ -6,18 +6,18 @@ async function watch(collectionName, handler) {
 }
 
 async function getSensorForKey(key) {
-  let collection = await client.getCollection('streamregistry-items');
+  let collection = await client.getCollection('sensorregistry-items');
   return collection.findOne({ key: key });
 }
 
 async function getSensorForSensorId(sensorid) {
-  let collection = await client.getCollection('streamregistry-items');
+  let collection = await client.getCollection('sensorregistry-items');
   return collection.findOne({ sensorid: sensorid });
 }
 
 async function getPurchasesForSensorKey(sensorKey) {
   let collection = await client.getCollection('purchaseregistry-items');
-  let purchases = await collection.find({ stream: sensorKey });
+  let purchases = await collection.find({ sensor: sensorKey });
   return purchases.toArray();
 }
 

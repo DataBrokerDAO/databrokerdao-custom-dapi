@@ -45,7 +45,8 @@ app.get('/unsubscribe', (req, res, next) => {
   registry
     .unsubscribe(email, sensorid)
     .then(response => {
-      let unsubscribedUrl = rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
+      let unsubscribedUrl =
+        rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
       res.redirect(unsubscribedUrl);
     })
     .catch(error => {
@@ -59,7 +60,10 @@ app.post('/:sensorid/data', async (req, res, next) => {
   const sensorCsvUrl = req.body.url;
   const sensorCsvData = req.body.data;
 
-  if (typeof sensorCsvUrl === 'undefined' && typeof sensorCsvData === 'undefined') {
+  if (
+    typeof sensorCsvUrl === 'undefined' &&
+    typeof sensorCsvData === 'undefined'
+  ) {
     return res.sendStatus(400);
   }
 
@@ -120,13 +124,16 @@ function bootstrap() {
 }
 
 async function handlePurchase(purchase) {
-  const sensor = await store.getSensorForKey(purchase.stream);
+  const sensor = await store.getSensorForKey(purchase.sensor);
   if (!sensor) {
-    console.log(`Error: could not find sensor for stream ${purchase.stream}`);
+    console.log(`Error: could not find sensor for stream ${purchase.sensor}`);
     return;
   }
 
-  const subscribed = await registry.isSubscribed(purchase.email, sensor.sensorid);
+  const subscribed = await registry.isSubscribed(
+    purchase.email,
+    sensor.sensorid
+  );
   if (subscribed) {
     console.log(`Notice: user already subscribed`);
     return;
