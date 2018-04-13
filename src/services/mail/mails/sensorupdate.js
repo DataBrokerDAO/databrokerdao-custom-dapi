@@ -32,15 +32,22 @@ async function getRecipients(sensor) {
     return purchase.endtime >= new Date() / 1000;
   };
 
-  const isSubscribed = (purchase, sensorid) => {
-    return registry.isSubscribed(purchase.email, sensorid);
+  const isSubscribed = (email, sensorid) => {
+    return registry.isSubscribed(email, sensorid);
   };
 
   let emailTo = [];
   let purchases = await mongo.getPurchasesForSensorKey(sensor.key);
   for (let i = 0; i < purchases.length; i++) {
-    if (notExpired(purchases[i]) && isSubscribed(purchases[i], sensor.sensorid)) {
-      emailTo.push(purchases[i].email);
+    const email = ecies
+      .decryptMessage(
+        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+        Buffer.from(purchases[i].email)
+      )
+      .toString('ascii');
+
+    if (notExpired(purchases[i]) && isSubscribed(email, sensor.sensorid)) {
+      emailTo.push(email);
     }
   }
 
@@ -52,14 +59,20 @@ function getSubject(sensor) {
 }
 
 function getUnsubscribeSingleUrl(sensor, email) {
-  const unsubscribeHash = Buffer.from(`${email}${DELIMITER}${sensor.sensorid}`).toString('base64');
-  const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
+  const unsubscribeHash = Buffer.from(
+    `${email}${DELIMITER}${sensor.sensorid}`
+  ).toString('base64');
+  const unsubscribeUrl = `${
+    process.env.MIDDLEWARE_URL
+  }/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }
 
 function getUnsubscribeAllUrl(email) {
   const unsubscribeHash = Buffer.from(email).toString('base64');
-  const unsubscribeUrl = `${process.env.MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
+  const unsubscribeUrl = `${
+    process.env.MIDDLEWARE_URL
+  }/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }
 
