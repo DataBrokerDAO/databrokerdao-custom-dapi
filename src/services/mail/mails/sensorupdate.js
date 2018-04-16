@@ -39,12 +39,18 @@ async function getRecipients(sensor) {
   let emailTo = [];
   let purchases = await mongo.getPurchasesForSensorKey(sensor.key);
   for (let i = 0; i < purchases.length; i++) {
-    const email = ecies
-      .decryptMessage(
-        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
-        Buffer.from(purchases[i].email)
-      )
-      .toString('ascii');
+    // Fallback for purchases that still have email not encrypted.
+    let email;
+    if (typeof purchases[i].email === 'string') {
+      email = purchases[i].email;
+    } else {
+      email = ecies
+        .decryptMessage(
+          Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+          Buffer.from(purchases[i].email)
+        )
+        .toString('ascii');
+    }
 
     if (notExpired(purchases[i]) && isSubscribed(email, sensor.sensorid)) {
       emailTo.push(email);

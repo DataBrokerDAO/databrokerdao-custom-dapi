@@ -132,12 +132,18 @@ async function handlePurchase(purchase) {
     return;
   }
 
-  const email = ecies
-    .decryptMessage(
-      Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
-      Buffer.from(purchase.email)
-    )
-    .toString('ascii');
+  // Fallback for purchases that still have email not encrypted.
+  let email;
+  if (typeof purchase.email === 'string') {
+    email = purchase.email;
+  } else {
+    email = ecies
+      .decryptMessage(
+        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+        Buffer.from(purchase.email)
+      )
+      .toString('ascii');
+  }
 
   const subscribed = await registry.isSubscribed(email, sensor.sensorid);
   if (subscribed) {
