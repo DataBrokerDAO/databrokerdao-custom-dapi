@@ -25,3 +25,4 @@ MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION [slug for the sensor registration man
 DAPP_BASE_URL                              [url of the dapp (need it for /unsubscribed)]
 NODE_ENV=                                  [debug|production]
 ```
+
