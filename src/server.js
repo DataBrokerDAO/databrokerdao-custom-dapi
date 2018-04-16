@@ -8,6 +8,8 @@ const registry = require('./services/mail/registry');
 const store = require('./services/mongo/store');
 const rp = require('request-promise');
 const rtrim = require('rtrim');
+const { ecies } = require('@settlemint/lib-crypto');
+const stripHexPrefix = require('strip-hex-prefix');
 
 const DELIMITER_HASH = '||';
 const DELIMITER_SENSOR = '!#!';
@@ -130,16 +132,26 @@ async function handlePurchase(purchase) {
     return;
   }
 
-  const subscribed = await registry.isSubscribed(
-    purchase.email,
-    sensor.sensorid
-  );
+  // Fallback for purchases that still have email not encrypted.
+  let email;
+  if (typeof purchase.email === 'string') {
+    email = purchase.email;
+  } else {
+    email = ecies
+      .decryptMessage(
+        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+        Buffer.from(purchase.email)
+      )
+      .toString('ascii');
+  }
+
+  const subscribed = await registry.isSubscribed(email, sensor.sensorid);
   if (subscribed) {
     console.log(`Notice: user already subscribed`);
     return;
   }
 
-  registry.subscribe(purchase.email, sensor.sensorid).then(subscription => {
+  registry.subscribe(email, sensor.sensorid).then(subscription => {
     sensorregister.send(subscription.email, sensor);
   });
 }
