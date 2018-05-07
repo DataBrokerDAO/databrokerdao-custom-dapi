@@ -115,6 +115,7 @@ function bootstrap() {
     console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
     store.watch('purchaseregistry-items', data => {
       if (data.operationType === 'insert') {
+        console.log(data.fullDocument);
         handlePurchase(data.fullDocument);
       }
     });
