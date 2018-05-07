@@ -47,8 +47,7 @@ app.get('/unsubscribe', (req, res, next) => {
   registry
     .unsubscribe(email, sensorid)
     .then(response => {
-      let unsubscribedUrl =
-        rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
+      let unsubscribedUrl = rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
       res.redirect(unsubscribedUrl);
     })
     .catch(error => {
@@ -62,10 +61,7 @@ app.post('/:sensorid/data', async (req, res, next) => {
   const sensorCsvUrl = req.body.url;
   const sensorCsvData = req.body.data;
 
-  if (
-    typeof sensorCsvUrl === 'undefined' &&
-    typeof sensorCsvData === 'undefined'
-  ) {
+  if (typeof sensorCsvUrl === 'undefined' && typeof sensorCsvData === 'undefined') {
     return res.sendStatus(400);
   }
 
@@ -119,6 +115,7 @@ function bootstrap() {
     console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
     store.watch('purchaseregistry-items', data => {
       if (data.operationType === 'insert') {
+        console.log(data.fullDocument);
         handlePurchase(data.fullDocument);
       }
     });
@@ -128,7 +125,7 @@ function bootstrap() {
 async function handlePurchase(purchase) {
   const sensor = await store.getSensorForKey(purchase.sensor);
   if (!sensor) {
-    console.log(`Error: could not find sensor for stream ${purchase.sensor}`);
+    console.log(`Error: could not find sensor ${purchase.sensor}`);
     return;
   }
 
@@ -138,10 +135,7 @@ async function handlePurchase(purchase) {
     email = purchase.email;
   } else {
     email = ecies
-      .decryptMessage(
-        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
-        Buffer.from(purchase.email)
-      )
+      .decryptMessage(Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'), Buffer.from(purchase.email))
       .toString('ascii');
   }
 
