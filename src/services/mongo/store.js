@@ -21,9 +21,16 @@ async function getPurchasesForSensorKey(sensorKey) {
   return purchases.toArray();
 }
 
+async function getPurchasesForPurchaseKey(purchaseKey) {
+  let collection = await client.getCollection('purchaseregistry-items');
+  let purchases = await collection.find({ key: purchaseKey });
+  return purchases.toArray();
+}
+
 module.exports = {
   watch,
   getSensorForKey,
   getSensorForSensorId,
-  getPurchasesForSensorKey
+  getPurchasesForSensorKey,
+  getPurchasesForPurchaseKey
 };
