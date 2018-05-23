@@ -4,12 +4,14 @@ const bodyParser = require('body-parser');
 const validator = require('validator');
 const sensorupdate = require('./services/mail/mails/sensorupdate');
 const sensorregister = require('./services/mail/mails/sensorregister');
+const datasetcredentials = require('./services/mail/mails/datasetcredentials');
 const registry = require('./services/mail/registry');
 const store = require('./services/mongo/store');
 const rp = require('request-promise');
 const rtrim = require('rtrim');
 const { ecies } = require('@settlemint/lib-crypto');
 const stripHexPrefix = require('strip-hex-prefix');
+const moment = require('moment');
 
 const DELIMITER_HASH = '||';
 const DELIMITER_SENSOR = '!#!';
@@ -47,7 +49,8 @@ app.get('/unsubscribe', (req, res, next) => {
   registry
     .unsubscribe(email, sensorid)
     .then(response => {
-      let unsubscribedUrl = rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
+      let unsubscribedUrl =
+        rtrim(process.env.DAPP_BASE_URL, '/') + '/unsubscribed';
       res.redirect(unsubscribedUrl);
     })
     .catch(error => {
@@ -61,7 +64,10 @@ app.post('/:sensorid/data', async (req, res, next) => {
   const sensorCsvUrl = req.body.url;
   const sensorCsvData = req.body.data;
 
-  if (typeof sensorCsvUrl === 'undefined' && typeof sensorCsvData === 'undefined') {
+  if (
+    typeof sensorCsvUrl === 'undefined' &&
+    typeof sensorCsvData === 'undefined'
+  ) {
     return res.sendStatus(400);
   }
 
@@ -134,7 +140,10 @@ async function handlePurchase(purchase) {
     email = purchase.email;
   } else {
     email = ecies
-      .decryptMessage(Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'), Buffer.from(purchase.email))
+      .decryptMessage(
+        Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+        Buffer.from(purchase.email)
+      )
       .toString('ascii');
   }
 
@@ -144,9 +153,60 @@ async function handlePurchase(purchase) {
     return;
   }
 
-  registry.subscribe(email, sensor.sensorid).then(subscription => {
-    sensorregister.send(subscription.email, sensor);
-  });
+  if (sensor.sensortype === 'DATASET') {
+    console.log(sensor.sensorid);
+    registry.subscribe(email, sensor.sensorid).then(subscription => {
+      handleDatasetPurchase(purchase, sensor);
+    });
+  } else {
+    registry.subscribe(email, sensor.sensorid).then(subscription => {
+      sensorregister.send(subscription.email, sensor);
+    });
+  }
+}
+
+async function handleDatasetPurchase(purchase, sensor) {
+  // Check if purchase is not expired yet
+  if (
+    !moment.unix(purchase.starttime).isBefore() && // starttime needs to be before now
+    !moment.unix(purchase.endtime).isAfter() // endtime needs to be after now
+  ) {
+    return console.log(
+      `Error: access to purchase with key ${purchase.key} has expired`
+    );
+  }
+
+  // Decrypt sensor credentials
+  let credentials;
+  try {
+    credentials = {
+      url: ecies
+        .decryptMessage(
+          Buffer.from(process.env.SERVER_PRIVATE_KEY, 'hex'),
+          Buffer.from(sensor.credentials.url)
+        )
+        .toString('ascii')
+    };
+  } catch (e) {
+    console.log(
+      `Error: could not decrypt credentials for sensor with key ${
+        purchase.sensor
+      }`,
+      e
+    );
+  }
+
+  // Send email with credentials to purchaser
+  try {
+    await datasetcredentials.send(purchase.email, sensor, credentials);
+  } catch (e) {
+    console.log(
+      `Error: could not send credentials by email for sensor with key ${
+        purchase.sensor
+      }`,
+      e
+    );
+  }
 }
 
 bootstrap();
