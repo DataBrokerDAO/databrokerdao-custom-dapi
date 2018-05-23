@@ -154,7 +154,6 @@ async function handlePurchase(purchase) {
   }
 
   if (sensor.sensortype === 'DATASET') {
-    console.log(sensor.sensorid);
     registry.subscribe(email, sensor.sensorid).then(subscription => {
       handleDatasetPurchase(purchase, sensor);
     });
@@ -166,6 +165,10 @@ async function handlePurchase(purchase) {
 }
 
 async function handleDatasetPurchase(purchase, sensor) {
+  console.log(
+    `Notice: handling purchase ${purchase.key} of dataset ${sensor.key}`
+  );
+
   // Check if purchase is not expired yet
   if (
     !moment.unix(purchase.starttime).isBefore() && // starttime needs to be before now
