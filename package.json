@@ -69,6 +69,7 @@
     "@types/raven": "^2.5.2",
     "@types/request-promise": "^4.1.42",
     "@types/sleep": "0.0.7",
+    "@types/validator": "^10.9.0",
     "@types/vision": "5.3.5",
     "jest": "^24.1.0",
     "nodemon": "^1.18.10",
