@@ -6,8 +6,8 @@ dotenv.load();
 export const DELIMITER_HASH: string = '||';
 export const DELIMITER_SENSOR: string = '!#!';
 
-export const DAPI_BASE_URL: string = rtrim(
-  process.env.DATABROKER_DAPI_BASE_URL || 'https://dapi.databrokerdao.com'
+export const DAPP_BASE_URL: string = rtrim(
+  process.env.DATABROKER_DAPP_BASE_URL
 );
 
 export const MONGO_DB_URL: string = rtrim(process.env.MONGO_DB_URL);

@@ -1,9 +1,9 @@
 import express from 'express';
 import bodyParser = require('body-parser');
-import { unsubscribe } from './mail/unsubscribe';
+import { unsubscribeRoute } from './mail/unsubscribe';
 
 const app = express();
 
 app.use(bodyParser);
 
-app.get('/debug', unsubscribe);
+app.get('/debug', unsubscribeRoute);
