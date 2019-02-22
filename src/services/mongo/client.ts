@@ -33,17 +33,17 @@ export async function getDb() {
     return db;
 }
 
-export async function getCollection(collectionName: string) {
+export async function getDbCollection(collectionName: string) {
   const db = await getDb();
   return db.collection(collectionName);
 }
 
-export async function listCollections() {
+export async function listDbCollections() {
   const db = await getDb();
   return db.collections();
 }
 
-export async function createCollection(collectionName: string) {
+export async function createDbCollection(collectionName: string) {
   const db = await getDb();
   return db.createCollection(collectionName);
 }
