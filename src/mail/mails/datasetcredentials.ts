@@ -2,7 +2,11 @@ import mailer from '../mailer';
 
 require('dotenv').config();
 
-export async function send(recipient: string, sensor, credentials) {
+export async function sendDataSetCredentials(
+  recipient: string,
+  sensor,
+  credentials
+) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const subject = `You successfully purchased '${sensor.name}'`;
   const globalMergeVars = getGlobalMergeVars(sensor, credentials);

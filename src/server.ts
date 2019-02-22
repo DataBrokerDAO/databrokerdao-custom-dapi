@@ -2,6 +2,11 @@ import express from 'express';
 import bodyParser = require('body-parser');
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './sensors/sensors';
+import { watch } from 'fs';
+import { ecies } from '@settlemint/lib-crypto';
+import { getSensorForKey } from './services/mongo/store';
+import { sendDataSetCredentials } from './mail/mails/datasetcredentials';
+import moment from 'moment';
 
 export const app = express();
 
@@ -14,7 +19,7 @@ app.post('/:sensorid/data', sensorDataRoute);
 function bootstrap() {
   app.listen(process.env.MIDDLEWARE_PORT, server => {
     console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
-    store.watch('purchaseregistry-items', data => {
+    watch('purchaseregistry-items', data => {
       if (data.operationType === 'insert') {
         handlePurchase(data.fullDocument);
       }
@@ -23,7 +28,7 @@ function bootstrap() {
 }
 
 async function handlePurchase(purchase) {
-  const sensor = await store.getSensorForKey(purchase.sensor);
+  const sensor = await getSensorForKey(purchase.sensor);
   if (!sensor) {
     console.log(`Error: could not find sensor ${purchase.sensor}`);
     return;
@@ -96,7 +101,7 @@ async function handleDatasetPurchase(purchase, sensor) {
 
   // Send email with credentials to purchaser
   try {
-    await datasetcredentials.send(purchase.email, sensor, credentials);
+    await sendDataSetCredentials(purchase.email, sensor, credentials);
   } catch (e) {
     console.log(
       `Error: could not send credentials by email for sensor with key ${
