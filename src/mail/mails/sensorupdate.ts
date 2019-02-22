@@ -1,10 +1,15 @@
-import { getPurchasesForSensorKey } from "../../services/mongo/store";
+import { getPurchasesForSensorKey } from '../../services/mongo/store';
+import { ISensor, IPurchase } from '../../types';
+import { Attachment } from 'nodemailer/lib/mailer';
+import { send as mailerSend } from '../mailer';
+import { isSubscribed as getIsSubscribed } from '../registries';
+import { ecies } from '@settlemint/lib-crypto';
 
 const DELIMITER = '||';
 
 require('dotenv').config();
 
-export async function send(sensor, attachments) {
+export async function send(sensor: ISensor, attachments: Attachment[]) {
   const recipients = await getRecipients(sensor);
   if (recipients.length === 0) {
     return Promise.resolve();
@@ -15,7 +20,7 @@ export async function send(sensor, attachments) {
   const subject = await getSubject(sensor);
   const globalMergeVars = getGlobalMergeVars(sensor);
   const mergeVars = getMergeVars(sensor, recipients);
-  return mailer.send(
+  return mailerSend(
     emailFrom,
     emailTo,
     subject,
@@ -26,13 +31,13 @@ export async function send(sensor, attachments) {
   );
 }
 
-async function getRecipients(sensor) {
-  const notExpired = purchase => {
-    return purchase.endtime >= new Date() / 1000;
+async function getRecipients(sensor: ISensor) {
+  const notExpired = (purchase: IPurchase) => {
+    return purchase.endtime >= new Date().getTime() / 1000;
   };
 
   const isSubscribed = (email: string, sensorid: string) => {
-    return registry.isSubscribed(email, sensorid);
+    return getIsSubscribed(email, sensorid);
   };
 
   let emailTo = [];
@@ -51,7 +56,7 @@ async function getRecipients(sensor) {
         .toString('ascii');
     }
 
-    if (notExpired(purchases[i]) && isSubscribed(email: string, sensor.sensorid)) {
+    if (notExpired(purchases[i]) && isSubscribed(email, sensor.sensorid)) {
       emailTo.push(email);
     }
   }
@@ -59,11 +64,11 @@ async function getRecipients(sensor) {
   return emailTo;
 }
 
-function getSubject(sensor) {
+function getSubject(sensor: ISensor) {
   return `New readings from '${sensor.name}'`;
 }
 
-function getUnsubscribeSingleUrl(sensor, email) {
+function getUnsubscribeSingleUrl(sensor: ISensor, email: string) {
   const unsubscribeHash = Buffer.from(
     `${email}${DELIMITER}${sensor.sensorid}`
   ).toString('base64');
@@ -73,7 +78,7 @@ function getUnsubscribeSingleUrl(sensor, email) {
   return unsubscribeUrl;
 }
 
-function getUnsubscribeAllUrl(email) {
+function getUnsubscribeAllUrl(email: string) {
   const unsubscribeHash = Buffer.from(email).toString('base64');
   const unsubscribeUrl = `${
     process.env.MIDDLEWARE_URL
@@ -81,7 +86,7 @@ function getUnsubscribeAllUrl(email) {
   return unsubscribeUrl;
 }
 
-function getGlobalMergeVars(sensor) {
+function getGlobalMergeVars(sensor: ISensor) {
   return [
     {
       name: 'SENSOR_NAME',
@@ -90,7 +95,7 @@ function getGlobalMergeVars(sensor) {
   ];
 }
 
-function getMergeVars(sensor, recipients) {
+function getMergeVars(sensor: ISensor, recipients: string[]) {
   let mergeVars = [];
   for (let i = 0; i < recipients.length; i++) {
     mergeVars.push({

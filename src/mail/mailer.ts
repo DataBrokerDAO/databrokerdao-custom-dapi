@@ -1,16 +1,17 @@
 import nodemailer from 'nodemailer';
-import mandrillTransport = require('nodemailer-mandrill-transport');
+import { MandrillTransport } from 'mandrill-nodemailer-transport';
+import { Attachment } from 'nodemailer/lib/mailer';
+import { IGlobalMergeVar, IMergeVar } from '../types';
+import { Mail } from '';
 
 require('dotenv').config();
 
-let transporter;
+let transporter: Mail;
 function createTransporter() {
   return new Promise((resolve, reject) => {
     transporter = nodemailer.createTransport(
-      mandrillTransport({
-        auth: {
-          apiKey: process.env.MANDRILL_API_KEY
-        }
+      new MandrillTransport({
+        apiKey: process.env.MANDRILL_API_KEY
       })
     );
     resolve(transporter);
@@ -18,13 +19,13 @@ function createTransporter() {
 }
 
 export async function send(
-  emailFrom,
-  emailTo,
-  subject,
-  attachments,
-  globalMergeVars,
-  mergeVars,
-  templateSlug
+  emailFrom: string,
+  emailTo: string,
+  subject: string,
+  attachments: Attachment[],
+  globalMergeVars: IGlobalMergeVar[],
+  mergeVars: IMergeVar[],
+  templateSlug: string
 ) {
   if (typeof transporter === 'undefined') {
     transporter = await createTransporter();
@@ -46,7 +47,7 @@ export async function send(
       }
     };
 
-    transporter.sendMail(options, (error, info) => {
+    transporter.sendMail(options, (error: Error, info) => {
       if (error) {
         return reject(error);
       }

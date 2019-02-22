@@ -1,6 +1,9 @@
 import { getDbCollection } from './client';
 
-export async function watch(collectionName: string, handler) {
+export async function watch(
+  collectionName: string,
+  handler: (...args: any[]) => void
+) {
   const collection = await getDbCollection(collectionName);
   collection.watch().on('change', handler);
 }
