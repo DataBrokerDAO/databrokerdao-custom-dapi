@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@settlemint/lib-crypto": "^4.7.0",
+    "axios": "^0.18.0",
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
     "mandrill-nodemailer-transport": "^1.0.1",
@@ -43,6 +44,7 @@
     "@types/async": "^2.4.1",
     "@types/async-lock": "^1.1.0",
     "@types/async-retry": "^1.2.1",
+    "@types/axios": "^0.14.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/bigi": "^1.4.2",
     "@types/boom": "^7.2.1",

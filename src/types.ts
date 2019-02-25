@@ -14,6 +14,8 @@ export interface ISensor {
 
 export interface IPurchase {
   endtime: number;
+  sensor: string;
+  email: string;
 }
 
 export interface IGlobalMergeVar {
