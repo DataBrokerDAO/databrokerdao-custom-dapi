@@ -5,10 +5,10 @@ let client: MongoClient;
 let db: Db;
 
 async function init() {
-  connectDb();
+  connect();
 }
 
-async function connectDb() {
+async function connect() {
   if (!client) {
     try {
       client = await MongoClient.connect(MONGO_DB_URL, {
@@ -24,26 +24,26 @@ async function connectDb() {
   return client;
 }
 
-export async function getDb() {
+export async function get() {
   if (!db) {
-    await connectDb();
+    await connect();
   }
 
   return db;
 }
 
-export async function getDbCollection(collectionName: string) {
-  const db = await getDb();
+export async function getCollection(collectionName: string) {
+  const db = await get();
   return db.collection(collectionName);
 }
 
-export async function listDbCollections() {
-  const db = await getDb();
+export async function listCollections() {
+  const db = await get();
   return db.collections();
 }
 
-export async function createDbCollection(collectionName: string) {
-  const db = await getDb();
+export async function createCollection(collectionName: string) {
+  const db = await get();
   return db.createCollection(collectionName);
 }
 

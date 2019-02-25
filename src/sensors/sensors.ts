@@ -45,6 +45,11 @@ export async function sensorDataRoute(req: Request, res: Response) {
   }
 
   let attachments: Attachment[];
+  console.log(
+    typeof sensorJsonUrl,
+    typeof sensorJsonUrl !== undefined,
+    typeof sensorJsonUrl !== 'undefined'
+  );
   if (typeof sensorJsonUrl !== 'undefined') {
     try {
       console.log('Attempting to fetch json data from the api');
@@ -58,7 +63,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
           content: content
         }
       ];
-      console.log(axiosData.data);
     } catch (error) {
       throw error;
     }
@@ -71,18 +75,18 @@ export async function sensorDataRoute(req: Request, res: Response) {
     //   const match = regexp.exec(sensorCsvUrl);
     //   const filename = match[1];
   } else if (typeof sensorJsonData !== 'undefined') {
-    const data = JSON.stringify(sensorJsonUrl);
-    const content = Buffer.from(data).toString('base64');
-    attachments = [
-      {
-        contentType: 'text',
-        filename: 'sensorupdate',
-        content: content
-      }
-    ];
+    const data = JSON.stringify(sensorJsonData);
+    // const content = Buffer.from(data).toString('base64');
+    // attachments = [
+    //   {
+    //     contentType: 'text',
+    //     filename: 'sensorupdate',
+    //     content: content
+    //   }
+    // ];
   }
 
   // TODO: re-enable
-  await sendSensorUpdate(sensor, attachments);
-  return res.sendStatus(200);
+  // await sendSensorUpdate(sensor, attachments);
+  // return res.sendStatus(200);
 }

@@ -58,7 +58,7 @@ app.get('/unsubscribe', (req, res, next) => {
     });
 });
 
-app.post('/:sensorid/data', async (req, res, next) => {
+app.post('/data', async (req, res, next) => {
   console.log(`Received data for sensor ${req.params.sensorid}`);
   const sensorID = req.params.sensorid;
   const sensorCsvUrl = req.body.url;
