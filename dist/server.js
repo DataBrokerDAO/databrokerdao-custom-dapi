@@ -1,40 +1,32 @@
-import express from 'express';
-import bodyParser = require('body-parser');
-import { unsubscribeRoute } from './mail/unsubscribe';
-import { sensorDataRoute } from './sensors/sensors';
-import { watch } from 'fs';
-import { ecies } from '@settlemint/lib-crypto';
-import { getSensorForKey } from './services/mongo/store';
-import { sendDataSetCredentials } from './mail/mails/datasetcredentials';
-import moment from 'moment';
-import { MIDDLEWARE_PORT } from './config/dapi-config';
-
-export const app = express();
-
-app.use(bodyParser.json());
-
-app.get('/debug', unsubscribeRoute);
-
-app.post('/sensorData/:sensorid', sensorDataRoute);
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const bodyParser = require("body-parser");
+const unsubscribe_1 = require("./mail/unsubscribe");
+const sensors_1 = require("./sensors/sensors");
+exports.app = express_1.default();
+exports.app.use(bodyParser);
+exports.app.get('/debug', unsubscribe_1.unsubscribeRoute);
+exports.app.post('/sensors/data', sensors_1.sensorDataRoute);
 function bootstrap() {
-  app.listen(MIDDLEWARE_PORT, () => {
-    console.log(`Listening on port ${MIDDLEWARE_PORT}`);
-    // watch('purchaseregistry-items', (data: {}) => {
-    //   if (data.operationType === 'insert') {
-    //     handlePurchase(data.fullDocument);
-    //   }
-    // });
-  });
+    exports.app.listen(process.env.MIDDLEWARE_PORT, () => {
+        console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
+        // watch('purchaseregistry-items', (data: {}) => {
+        //   if (data.operationType === 'insert') {
+        //     handlePurchase(data.fullDocument);
+        //   }
+        // });
+    });
 }
-
 // async function handlePurchase(purchase) {
 //   const sensor = await getSensorForKey(purchase.sensor);
 //   if (!sensor) {
 //     console.log(`Error: could not find sensor ${purchase.sensor}`);
 //     return;
 //   }
-
 //   // Fallback for purchases that still have email not encrypted.
 //   let email;
 //   if (typeof purchase.email === 'string') {
@@ -47,13 +39,11 @@ function bootstrap() {
 //       )
 //       .toString('ascii');
 //   }
-
 //   const subscribed = await registry.isSubscribed(email, sensor.sensorid);
 //   if (subscribed) {
 //     console.log(`Notice: user already subscribed`);
 //     return;
 //   }
-
 //   if (sensor.sensortype === 'DATASET') {
 //     registry.subscribe(email, sensor.sensorid).then(subscription => {
 //       handleDatasetPurchase(purchase, sensor);
@@ -64,12 +54,10 @@ function bootstrap() {
 //     });
 //   }
 // }
-
 // async function handleDatasetPurchase(purchase, sensor) {
 //   console.log(
 //     `Notice: handling purchase ${purchase.key} of dataset ${sensor.key}`
 //   );
-
 //   // Check if purchase is not expired yet
 //   if (
 //     !moment.unix(purchase.starttime).isBefore() && // starttime needs to be before now
@@ -79,7 +67,6 @@ function bootstrap() {
 //       `Error: access to purchase with key ${purchase.key} has expired`
 //     );
 //   }
-
 //   // Decrypt sensor credentials
 //   let credentials;
 //   try {
@@ -112,5 +99,5 @@ function bootstrap() {
 //     );
 //   }
 // }
-
 bootstrap();
+//# sourceMappingURL=server.js.map

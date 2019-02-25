@@ -9,21 +9,24 @@ import { send as sendSensorUpdate } from '../mail/mails/sensorupdate';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   console.log(`Received data for sensor ${req.params.sensorid}`);
-  const sensorID = req.params.sensorid;
-  const sensorCsvUrl = req.body.url;
-  const sensorCsvData = req.body.data;
+  const sensorId = req.params.sensorid;
+  const sensorJsonUrl = req.body.url;
+  const sensorJsonData = req.body.data;
 
+  console.log(sensorId);
+  console.log(req);
   if (
-    typeof sensorCsvUrl === 'undefined' &&
-    typeof sensorCsvData === 'undefined'
+    typeof sensorJsonUrl === 'undefined' &&
+    typeof sensorJsonData === 'undefined'
   ) {
     return res.sendStatus(400);
   }
 
   // Return early if there are no purchases
-  const sensor = await getSensorForSensorId(sensorID);
+  const sensor = await getSensorForSensorId(sensorId);
+  console.log(sensor, sensorId);
   if (!sensor) {
-    console.log(`Could not find sensor ${sensorID}, possible race condition`);
+    console.log(`Could not find sensor ${sensorId}, possible race condition`);
     return res.sendStatus(404);
   }
 
@@ -33,7 +36,8 @@ export async function sensorDataRoute(req: Request, res: Response) {
   }
 
   let attachments: Attachment[];
-  if (typeof sensorCsvUrl !== 'undefined') {
+  if (typeof sensorJsonUrl !== 'undefined') {
+    
     let data = await rp({ url: sensorCsvUrl });
     data = data.replace(/;/g, ','); // Change delimiter so mail clients can parse it;
     const content = Buffer.from(data).toString('base64');
@@ -49,8 +53,8 @@ export async function sensorDataRoute(req: Request, res: Response) {
         content: content
       }
     ];
-  } else if (typeof sensorCsvData !== 'undefined') {
-    const data = JSON.stringify(sensorCsvData);
+  } else if (typeof sensorJsonData !== 'undefined') {
+    const data = JSON.stringify(sensorJsonUrl);
     const content = Buffer.from(data).toString('base64');
     attachments = [
       {
@@ -62,6 +66,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
   }
 
   // TODO: re-enable
-  await sendSensorUpdate(sensor, attachments);
-  return res.sendStatus(200);
+  // await sendSensorUpdate(sensor, attachments);
+  // return res.sendStatus(200);
 }
