@@ -22,7 +22,8 @@ export async function sensorDataRoute(req: Request, res: Response) {
   ) {
     return res.sendStatus(400);
   }
-
+  // TODO: change get sensor by ID by the endpoint given by PJ in slack
+  // TODO: why do you need it? because you need to go from sensorid => sensor.key (which is the smart contract address)
   // Return early if there are no purchases
   const sensor = await getSensorForSensorId(sensorId).catch(() => {
     res.sendStatus(500);
@@ -32,7 +33,7 @@ export async function sensorDataRoute(req: Request, res: Response) {
     return res.sendStatus(404);
   }
 
-  // TODO: Remove any?
+  //TODO: fetch purchases from DAPI - instead of going to mongo, use the DAPI endpoint
   const purchases: any = await getPurchasesForSensorKey(sensor.key).catch(
     () => {
       res.sendStatus(500);
@@ -43,6 +44,7 @@ export async function sensorDataRoute(req: Request, res: Response) {
     return res.sendStatus(200);
   }
 
+  // TODO: attachment now becomes the data packet sent through the request body
   let attachments: Attachment[];
   console.log(
     typeof sensorJsonUrl,
@@ -86,6 +88,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
   }
 
   // TODO: re-enable
-  // await sendSensorUpdate(sensor, attachments);
+  await sendSensorUpdate(sensor, attachments);
   // return res.sendStatus(200);
 }

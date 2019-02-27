@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser = require('body-parser');
 import { unsubscribeRoute } from './mail/unsubscribe';
-import { sensorDataRoute } from './sensors/sensors';
+import { sensorDataRoute } from './routes/sensors';
 import { watch } from 'fs';
 import { ecies } from '@settlemint/lib-crypto';
 import { getSensorForKey } from './services/mongo/store';
@@ -15,11 +15,12 @@ app.use(bodyParser.json());
 
 app.get('/debug', unsubscribeRoute);
 
-app.post('/sensorData/', sensorDataRoute);
+app.post('/sensor/:sensorid/', sensorDataRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
     console.log(`Listening on port ${MIDDLEWARE_PORT}`);
+    // TODO: replace this by purchase CRON
     // watch('purchaseregistry-items', (data: {}) => {
     //   if (data.operationType === 'insert') {
     //     handlePurchase(data.fullDocument);
