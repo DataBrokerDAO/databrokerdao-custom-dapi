@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 app.get('/debug', unsubscribeRoute);
 
-app.post('/sensorData/:sensorid', sensorDataRoute);
+app.post('/sensorData/', sensorDataRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {

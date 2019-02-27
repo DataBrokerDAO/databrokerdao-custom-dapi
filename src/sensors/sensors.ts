@@ -12,11 +12,10 @@ import { date } from 'joi';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   console.log(`Received data for sensor ${req.params.sensorid}`);
-  const sensorId = req.params.sensorid;
   const sensorJsonUrl = req.body.url;
   const sensorJsonData = req.body.data;
 
-  console.log(sensorId, sensorJsonUrl, sensorJsonData);
+  console.log(sensorJsonUrl, sensorJsonData);
   if (
     typeof sensorJsonUrl === 'undefined' &&
     typeof sensorJsonData === 'undefined'
@@ -76,14 +75,14 @@ export async function sensorDataRoute(req: Request, res: Response) {
     //   const filename = match[1];
   } else if (typeof sensorJsonData !== 'undefined') {
     const data = JSON.stringify(sensorJsonData);
-    // const content = Buffer.from(data).toString('base64');
-    // attachments = [
-    //   {
-    //     contentType: 'text',
-    //     filename: 'sensorupdate',
-    //     content: content
-    //   }
-    // ];
+    const content = Buffer.from(data).toString('base64');
+    attachments = [
+      {
+        contentType: 'text',
+        filename: 'sensorupdate',
+        content: content
+      }
+    ];
   }
 
   // TODO: re-enable
