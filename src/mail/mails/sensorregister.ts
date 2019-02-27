@@ -1,7 +1,5 @@
 import mailer from '../mailer';
 
-require('dotenv').config();
-
 export async function send(recipient: string, sensor) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const subject = `Sensor Registration '${sensor.name}'`;

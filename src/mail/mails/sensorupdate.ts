@@ -1,13 +1,11 @@
-import { getPurchasesForSensorKey } from '../../services/mongo/store';
-import { ISensor, IPurchase } from '../../types';
+import { ecies } from '@settlemint/lib-crypto';
 import { Attachment } from 'nodemailer/lib/mailer';
+import { getPurchasesForSensorKey } from '../../services/mongo/store';
+import { IPurchase, ISensor } from '../../types';
 import { send as mailerSend } from '../mailer';
 import { isSubscribed as getIsSubscribed } from '../registries';
-import { ecies } from '@settlemint/lib-crypto';
 
 const DELIMITER = '||';
-
-require('dotenv').config();
 
 export async function send(sensor: ISensor, attachments: Attachment[]) {
   const recipients = await getRecipients(sensor);
@@ -40,8 +38,8 @@ async function getRecipients(sensor: ISensor) {
     return getIsSubscribed(email, sensorid);
   };
 
-  let emailTo = [];
-  let purchases = await getPurchasesForSensorKey(sensor.key);
+  const emailTo = [];
+  const purchases = await getPurchasesForSensorKey(sensor.key);
   for (let i = 0; i < purchases.length; i++) {
     // Fallback for purchases that still have email not encrypted.
     let email;
@@ -96,7 +94,7 @@ function getGlobalMergeVars(sensor: ISensor) {
 }
 
 function getMergeVars(sensor: ISensor, recipients: string[]) {
-  let mergeVars = [];
+  const mergeVars = [];
   for (let i = 0; i < recipients.length; i++) {
     mergeVars.push({
       rcpt: recipients[i],

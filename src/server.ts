@@ -1,13 +1,8 @@
-import express from 'express';
 import bodyParser = require('body-parser');
+import express from 'express';
+import { MIDDLEWARE_PORT } from './config/dapi-config';
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './routes/sensors';
-import { watch } from 'fs';
-import { ecies } from '@settlemint/lib-crypto';
-import { getSensorForKey } from './services/mongo/store';
-import { sendDataSetCredentials } from './mail/mails/datasetcredentials';
-import moment from 'moment';
-import { MIDDLEWARE_PORT } from './config/dapi-config';
 
 export const app = express();
 
@@ -15,7 +10,7 @@ app.use(bodyParser.json());
 
 app.get('/debug', unsubscribeRoute);
 
-app.post('/sensor/:sensorid/', sensorDataRoute);
+app.post('/sensor/:sensorid', sensorDataRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
