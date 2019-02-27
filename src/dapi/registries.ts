@@ -1,12 +1,42 @@
 import rp = require('request-promise');
 import { DATABROKER_DAPI_BASE_URL } from '../config/dapi-config';
+import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 
-export async function getSensorKeyForSensorId(authToken: string, id: string) {
-  const sensors = await getSensorRegistry(authToken);
-  console.log(sensors);
+let sensorKeys: { [index: string]: string } = {};
+
+// TODO: Implement caching to avoid ddos issues on the server? Does this even work?
+// export async function getSensorKeyForSensorId(
+//   authToken: string,
+//   sensorId: string
+// ) {
+//   try {
+//     const response = await rp({
+//       method: 'GET',
+//       uri: buildSensorKeyUrl(sensorId),
+//       body: {},
+//       headers: { authorization: authToken },
+//       json: true
+//     });
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
+
+// function buildSensorKeyUrl(sensorId: string) {
+//   return `${DATABROKER_DAPI_BASE_URL}/sensorregistry/list?abi=false&item.sensorid='${sensorId}`;
+// }
+
+export async function getSensorKeyForSensorId(sensorId: string) {
+  return sensorKeys[sensorId];
 }
 
-async function getSensorRegistry(authToken: string) {
+export async function updateSensorKeys(authToken: string) {
+  const sensors = await getSensors(authToken);
+  sensorKeys = await transformSensorsToSensorsIdKeyPair(sensors);
+}
+
+async function getSensors(authToken: string) {
   try {
     const response = await rp({
       method: 'GET',
@@ -15,9 +45,8 @@ async function getSensorRegistry(authToken: string) {
       headers: { authorization: authToken },
       json: true
     });
-    return response;
+    return response.items;
   } catch (error) {
-    console.log('Failed to fetch sensorregistry');
     throw error;
   }
 }

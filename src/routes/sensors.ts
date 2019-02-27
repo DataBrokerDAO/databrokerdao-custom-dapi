@@ -10,31 +10,33 @@ import {
   getSensorForSensorId
 } from '../services/mongo/store';
 import { IPurchase, ISensor } from '../types';
+import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 
 export async function sensorDataRoute(req: Request, res: Response) {
-  console.log(`Received data for sensor ${req.params.sensorid}`);
-  const sensorId = req.params.sensorid;
-  const sensorJsonData = req.body.data;
-
-  console.log(sensorJsonData);
-  if (typeof sensorJsonData === 'undefined') {
+  console.log(`Received data for sensor ${req.body.key}`);
+  const sensorId = req.body.key;
+  const sensor = req.body;
+  console.log(sensor);
+  if (typeof sensor.key === 'undefined') {
     return res.sendStatus(400);
   }
 
   const authToken = await authenticate();
+  console.log(authToken);
 
-  console.log(await getSensorKeyForSensorId(authToken, sensorId));
-
-  // // TODO: change get sensor by ID by the endpoint given by PJ in slack
-  // // TODO: why do you need it? because you need to go from sensorid => sensor.key (which is the smart contract address)
-  // // Return early if there are no purchases
-  // const sensor = await getSensorForSensorId(sensorId).catch(() => {
-  //   res.sendStatus(500);
-  // });
-  // if (!sensor) {
-  //   console.log(`Could not find sensor ${sensorId}, possible race condition`);
-  //   return res.sendStatus(404);
-  // }
+  // TODO: change get sensor by ID by the endpoint given by PJ in slack
+  // TODO: why do you need it? because you need to go from sensorid => sensor.key (which is the smart contract address)
+  // Return early if there are no purchases
+  const sensorKey = await getSensorKeyForSensorId(sensorId).catch(
+    () => {
+      res.sendStatus(500);
+    }
+  );
+  console.log(sensorKey, 'Sensorkey');
+  if (!sensor) {
+    console.log(`Could not find sensor ${sensorId}, possible race condition`);
+    return res.sendStatus(404);
+  }
 
   // // TODO: fetch purchases from DAPI - instead of going to mongo, use the DAPI endpoint
   // const purchases: any = await getPurchasesForSensorKey(sensor.key).catch(

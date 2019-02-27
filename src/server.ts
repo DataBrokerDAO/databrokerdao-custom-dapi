@@ -1,6 +1,8 @@
 import bodyParser = require('body-parser');
 import express from 'express';
 import { MIDDLEWARE_PORT } from './config/dapi-config';
+import { authenticate } from './dapi/auth';
+import { updateSensorKeys } from './dapi/registries';
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './routes/sensors';
 
@@ -10,7 +12,7 @@ app.use(bodyParser.json());
 
 app.get('/debug', unsubscribeRoute);
 
-app.post('/sensor/:sensorid', sensorDataRoute);
+app.post('/sensor', sensorDataRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
@@ -22,6 +24,11 @@ function bootstrap() {
     //   }
     // });
   });
+}
+
+async function init() {
+  const authToken = await authenticate();
+  updateSensorKeys(authToken);
 }
 
 // async function handlePurchase(purchase) {
@@ -110,3 +117,4 @@ function bootstrap() {
 // }
 
 bootstrap();
+init();
