@@ -33,6 +33,6 @@ export const DATABROKER_DAPI_PASSWORD: string =
   process.env.DATABROKER_DAPI_PASSWORD;
 
 export const DATABROKER_DAPI_BASE_URL: string = rtrim(
-  process.env.DATABROKER_DAPI_BASE_URL || 'https://d3v.databrokerdao.com',
+  process.env.DATABROKER_DAPI_BASE_URL || 'https://d3v.databrokerdao.com/dapi',
   '/'
 );

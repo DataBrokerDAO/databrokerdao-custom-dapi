@@ -1,4 +1,4 @@
-import rp = require('request-promise');
+import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { DATABROKER_DAPI_BASE_URL } from '../config/dapi-config';
 
 // TODO: Implement caching to avoid ddos issues on the server?
@@ -7,12 +7,8 @@ export async function getSensorPurchasesForSensorKey(
   sensorId: string
 ) {
   try {
-    const response = await rp({
-      method: 'GET',
-      uri: buildSensorKeyUrl(sensorId),
-      body: {},
-      headers: { authorization: authToken },
-      json: true
+    const response = await axios.get(buildSensorKeyUrl(sensorId), {
+      headers: { authorization: authToken }
     });
     return response;
   } catch (error) {
@@ -21,5 +17,5 @@ export async function getSensorPurchasesForSensorKey(
 }
 
 function buildSensorKeyUrl(sensorId: string) {
-  return `${DATABROKER_DAPI_BASE_URL}/dapi/sensorregistry/list?abi=false&item.sensorid='${sensorId}`;
+  return `${DATABROKER_DAPI_BASE_URL}/sensorregistry/list?abi=false&item.sensorid='${sensorId}`;
 }

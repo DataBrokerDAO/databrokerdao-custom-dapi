@@ -1,4 +1,4 @@
-import rp = require('request-promise');
+import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import {
   DATABROKER_DAPI_BASE_URL,
   DATABROKER_DAPI_PASSWORD,
@@ -10,22 +10,14 @@ let authToken: string;
 export async function authenticate() {
   try {
     if (!authenticated()) {
-      const options = {
-        method: 'POST',
-        uri: `${DATABROKER_DAPI_BASE_URL}/dapi/v1/users/authenticate`,
-        body: {
+      const response = await axios.post(
+        `${DATABROKER_DAPI_BASE_URL}/v1/users/authenticate`,
+        {
           username: DATABROKER_DAPI_USERNAME,
           password: DATABROKER_DAPI_PASSWORD
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        json: true
-      };
-
-      const response = await rp(options);
-      authToken = response.jwtToken;
+        }
+      );
+      authToken = response.data.jwtToken;
     }
     return authToken;
   } catch (error) {

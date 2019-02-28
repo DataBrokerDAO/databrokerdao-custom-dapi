@@ -1,7 +1,6 @@
 import Axios from 'axios';
 import { Request, Response } from 'express';
 import { Attachment } from 'nodemailer/lib/mailer';
-import rp = require('request-promise');
 import { authenticate } from '../dapi/auth';
 import { getSensorKeyForSensorId } from '../dapi/registries';
 import { send as sendSensorUpdate } from '../mail/mails/sensorupdate';
@@ -39,7 +38,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
 
   // TODO: fetch purchases from DAPI - instead of going to mongo, use the DAPI endpoint
   // TODO: Should we cache this also for an update each 24 hours?
-  console.log(sensor.key);
   const purchases = await getSensorPurchasesForSensorKey(
     authToken,
     sensorKey
@@ -48,9 +46,10 @@ export async function sensorDataRoute(req: Request, res: Response) {
   });
 
   console.log(purchases);
-  if (purchases.length === 0) {
-    return res.sendStatus(200);
-  }
+  // TODO: fix error
+  // if (purchases.length === 0) {
+  //   return res.sendStatus(200);
+  // }
 
   // TODO: attachment now becomes the data packet sent through the request body
   let attachments: Attachment[];
