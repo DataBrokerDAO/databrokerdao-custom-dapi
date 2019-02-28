@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 app.get('/debug', unsubscribeRoute);
 
-app.post('/sensor', sensorDataRoute);
+app.post('/sensor/data', sensorDataRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
@@ -28,6 +28,9 @@ function bootstrap() {
 
 async function init() {
   const authToken = await authenticate();
+  // Loads the sensorkeys to cache
+  // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
+  // TODO: What if a sensor is not defined in cache?
   updateSensorKeys(authToken);
 }
 
