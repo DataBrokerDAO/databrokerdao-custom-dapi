@@ -27,10 +27,12 @@ export const MANDRILL_TEMPLATE_SLUG_SENSOR_REGISTRATION: string =
 export const MANDRILL_TEMPLATE_SLUG_DATASET_CREDENTIALS: string =
   process.env.MIDDLEWARE_PORT;
 
-export const DATABROKER_DAPI_USERNAME: string = process.env.DATABROKER_DAPI_USERNAME;
-export const DATABROKER_DAPI_PASSWORD: string = process.env.DATABROKER_DAPI_PASSWORD;
+export const DATABROKER_DAPI_USERNAME: string =
+  process.env.DATABROKER_DAPI_USERNAME;
+export const DATABROKER_DAPI_PASSWORD: string =
+  process.env.DATABROKER_DAPI_PASSWORD;
 
 export const DATABROKER_DAPI_BASE_URL: string = rtrim(
-  process.env.DATABROKER_DAPI_BASE_URL || 'https://dapi.databrokerdao.com',
+  process.env.DATABROKER_DAPI_BASE_URL || 'https://d3v.databrokerdao.com',
   '/'
 );

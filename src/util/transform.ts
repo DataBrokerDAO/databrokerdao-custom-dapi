@@ -1,10 +1,11 @@
-import { ISensor } from '../types';
+import { IDapiSensor } from '../types';
 
-export async function transformSensorsToSensorsIdKeyPair(sensors: ISensor[]) {
+export async function transformSensorsToSensorsIdKeyPair(
+  sensors: IDapiSensor[]
+) {
   const sensorIdKeyPair = {};
   for (const sensor of sensors) {
-    sensorIdKeyPair[sensor.sensorid] = sensor.key;
+    sensorIdKeyPair[sensor.sensorid] = sensor.contractAddress;
   }
-  console.log(sensorIdKeyPair);
   return sensorIdKeyPair;
 }

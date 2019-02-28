@@ -27,3 +27,8 @@ export interface IMergeVar {
   rcpt: string;
   vars: IGlobalMergeVar[];
 }
+
+export interface IDapiSensor {
+  contractAddress: string;
+  sensorid: string;
+}

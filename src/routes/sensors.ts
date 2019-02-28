@@ -12,25 +12,25 @@ import {
 import { IPurchase, ISensor } from '../types';
 import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 import { getSensorPurchasesForSensorKey } from '../dapi/purchase';
+import { DATABROKER_DAPI_BASE_URL } from '../config/dapi-config';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   console.log(`Received data for sensor ${req.body.key}`);
   const sensorId = req.body.key;
   const sensor = req.body;
-  console.log(sensor);
   if (typeof sensor.key === 'undefined') {
     return res.sendStatus(400);
   }
 
   const authToken = await authenticate();
-  console.log(authToken);
 
   // TODO: change get sensor by ID by the endpoint given by PJ in slack
   // TODO: why do you need it? because you need to go from sensorid => sensor.key (which is the smart contract address)
   // Return early if there are no purchases
-  const sensorKey = await getSensorKeyForSensorId(sensorId).catch(() => {
-    res.sendStatus(500);
-  });
+  const sensorKey = await getSensorKeyForSensorId(authToken, sensorId);
+  if (sensorKey == undefined) {
+    return res.sendStatus(500);
+  }
   console.log(sensorKey, 'Sensorkey');
   if (!sensor) {
     console.log(`Could not find sensor ${sensorId}, possible race condition`);
@@ -39,12 +39,14 @@ export async function sensorDataRoute(req: Request, res: Response) {
 
   // TODO: fetch purchases from DAPI - instead of going to mongo, use the DAPI endpoint
   // TODO: Should we cache this also for an update each 24 hours?
-  const purchases: any = await getSensorPurchasesForSensorKey(
+  console.log(sensor.key);
+  const purchases = await getSensorPurchasesForSensorKey(
     authToken,
-    sensor.key
-  ).catch(() => {
-    res.sendStatus(500);
+    sensorKey
+  ).catch((error: never) => {
+    return res.sendStatus(500);
   });
+
   console.log(purchases);
   if (purchases.length === 0) {
     return res.sendStatus(200);

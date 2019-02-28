@@ -1,7 +1,6 @@
 import rp = require('request-promise');
 import { DATABROKER_DAPI_BASE_URL } from '../config/dapi-config';
 
-
 // TODO: Implement caching to avoid ddos issues on the server?
 export async function getSensorPurchasesForSensorKey(
   authToken: string,
@@ -22,5 +21,5 @@ export async function getSensorPurchasesForSensorKey(
 }
 
 function buildSensorKeyUrl(sensorId: string) {
-  return `${DATABROKER_DAPI_BASE_URL}/sensorregistry/list?abi=false&item.sensorid='${sensorId}`;
+  return `${DATABROKER_DAPI_BASE_URL}/dapi/sensorregistry/list?abi=false&item.sensorid='${sensorId}`;
 }

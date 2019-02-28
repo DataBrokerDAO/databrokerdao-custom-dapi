@@ -12,7 +12,7 @@ export async function authenticate() {
     if (!authenticated()) {
       const options = {
         method: 'POST',
-        uri: `${DATABROKER_DAPI_BASE_URL}/accounts/authenticate`,
+        uri: `${DATABROKER_DAPI_BASE_URL}/dapi/v1/users/authenticate`,
         body: {
           username: DATABROKER_DAPI_USERNAME,
           password: DATABROKER_DAPI_PASSWORD
@@ -25,7 +25,7 @@ export async function authenticate() {
       };
 
       const response = await rp(options);
-      authToken = response.token;
+      authToken = response.jwtToken;
     }
     return authToken;
   } catch (error) {
