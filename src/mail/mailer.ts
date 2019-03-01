@@ -1,9 +1,7 @@
-import nodemailer from 'nodemailer';
 import { MandrillTransport } from 'mandrill-nodemailer-transport';
+import nodemailer from 'nodemailer';
 import { Attachment } from 'nodemailer/lib/mailer';
 import { IGlobalMergeVar, IMergeVar } from '../types';
-
-require('dotenv').config();
 
 let transporter: nodemailer.Transporter;
 async function createTransporter() {
@@ -27,16 +25,16 @@ export async function send(
     transporter = await createTransporter();
   }
 
-  let options = {
+  const options = {
     from: emailFrom,
     to: emailTo,
-    subject: subject,
+    subject,
     mandrillOptions: {
       template_name: templateSlug,
       message: {
         global_merge_vars: globalMergeVars,
         merge_vars: mergeVars,
-        attachments: attachments
+        attachments
       }
     }
   };

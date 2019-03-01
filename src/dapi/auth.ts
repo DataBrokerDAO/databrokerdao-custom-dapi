@@ -1,4 +1,4 @@
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import {
   DATABROKER_DAPI_PASSWORD,
   DATABROKER_DAPI_USERNAME
@@ -9,13 +9,10 @@ let authToken: string;
 export async function authenticate() {
   try {
     if (!authenticated()) {
-      const response = await axios.post(
-        `/v1/users/authenticate`,
-        {
-          username: DATABROKER_DAPI_USERNAME,
-          password: DATABROKER_DAPI_PASSWORD
-        }
-      );
+      const response = await axios.post(`/v1/users/authenticate`, {
+        username: DATABROKER_DAPI_USERNAME,
+        password: DATABROKER_DAPI_PASSWORD
+      });
       authToken = response.data.jwtToken;
       axios.defaults.headers.common.Authorization = authToken;
     }

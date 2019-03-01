@@ -1,5 +1,5 @@
-import validator from 'validator';
 import express from 'express';
+import validator from 'validator';
 import { DELIMITER_SENSOR } from '../config/dapi-config';
 
 export function validateUnsubscribe(
@@ -15,13 +15,13 @@ export function validateUnsubscribe(
   }
 }
 
-function isValidEmail(email: string): Boolean {
+function isValidEmail(email: string): boolean {
   return validator.isEmail(email);
 }
 
-function isValidInput(sensorId: string): Boolean {
+function isValidInput(sensorId: string): boolean {
   const sensorIdParts = sensorId.split(DELIMITER_SENSOR);
   return (
-    sensorId !== undefined && sensorId !== null && sensorIdParts.length == 3
+    sensorId !== undefined && sensorId !== null && sensorIdParts.length === 3
   );
 }

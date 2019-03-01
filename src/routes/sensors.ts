@@ -37,8 +37,9 @@ export async function sensorDataRoute(req: Request, res: Response) {
       return res.sendStatus(500);
     }
   );
-
-  console.log(purchases);
+  if (purchases.total > 0) {
+    console.log(purchases);
+  }
   // TODO: fix error
   // if (purchases.length === 0) {
   //   return res.sendStatus(200);

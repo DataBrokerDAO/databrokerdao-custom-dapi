@@ -1,10 +1,9 @@
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 
 let sensorKeys: { [index: string]: string } = {};
 
 export async function getSensorKeyForSensorId(sensorId: string) {
-  console.log(await querySensorKeyById(sensorId));
   return sensorKeys[sensorId] || querySensorKeyById(sensorId);
 }
 

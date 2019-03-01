@@ -1,4 +1,4 @@
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 // TODO: Implement caching to avoid ddos issues on the server?
 export async function getSensorPurchasesForSensorKey(sensorId: string) {
@@ -11,5 +11,5 @@ export async function getSensorPurchasesForSensorKey(sensorId: string) {
 }
 
 function buildSensorKeyUrl(sensorId: string) {
-  return `/purchaseregistry/list?abi=false&item.sensor=${sensorId}`;
+  return `/purchaseregistry/list?abi=false&item.sensor=~${sensorId}`;
 }

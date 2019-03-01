@@ -16,7 +16,7 @@ export async function send(recipient: string, sensor: ISensor) {
   );
 }
 
-function getGlobalMergeVars(sensor) {
+function getGlobalMergeVars(sensor: ISensor) {
   return [
     {
       name: 'SENSOR_NAME',

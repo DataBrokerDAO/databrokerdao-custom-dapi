@@ -1,28 +1,28 @@
-import mailer from '../mailer';
-
-require('dotenv').config();
+import { MANDRILL_TEMPLATE_SLUG_DATASET_CREDENTIALS } from '../../config/dapi-config';
+import { ISensor } from '../../types';
+import { send as sendEmail } from '../mailer';
 
 export async function sendDataSetCredentials(
   recipient: string,
-  sensor,
+  sensor: ISensor,
   credentials
 ) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const subject = `You successfully purchased '${sensor.name}'`;
   const globalMergeVars = getGlobalMergeVars(sensor, credentials);
 
-  await mailer.send(
+  await sendEmail(
     emailFrom,
     recipient,
     subject,
     [], // no attachments
     globalMergeVars,
     [], // no merge vars
-    process.env.MANDRILL_TEMPLATE_SLUG_DATASET_CREDENTIALS
+    MANDRILL_TEMPLATE_SLUG_DATASET_CREDENTIALS
   );
 }
 
-function getGlobalMergeVars(sensor, credentials) {
+function getGlobalMergeVars(sensor: ISensor, credentials) {
   return [
     {
       name: 'SENSOR_NAME',
