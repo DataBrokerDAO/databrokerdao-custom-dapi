@@ -1,7 +1,6 @@
 import Axios from 'axios';
 import { Request, Response } from 'express';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { DATABROKER_DAPI_BASE_URL } from '../config/dapi-config';
 import { authenticate } from '../dapi/auth';
 import { getSensorPurchasesForSensorKey } from '../dapi/purchase';
 import { getSensorKeyForSensorId } from '../dapi/registries';
