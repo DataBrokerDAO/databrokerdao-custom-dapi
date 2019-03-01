@@ -4,21 +4,25 @@ import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 let sensorKeys: { [index: string]: string } = {};
 
 export async function getSensorKeyForSensorId(sensorId: string) {
-  return sensorKeys[sensorId] || querySensorKeyById(sensorId);
+  const sensorKey = sensorKeys[sensorId]; // || (await querySensorKeyById(sensorId));
+  console.log(sensorKey);
+  return sensorKey;
 }
 
 export async function updateSensorKeys() {
+  console.log('Updating sensorkeys');
   const sensors = await getSensors();
-  const sensorAmount: any = {};
-
-  sensorKeys = await transformSensorsToSensorsIdKeyPair(sensors);
+  sensorKeys = transformSensorsToSensorsIdKeyPair(sensors);
+  console.log('Finished fetching sensorkeys');
 }
 
 async function querySensorKeyById(sensorId: string) {
   try {
     const response = await axios.get(buildSensorQueryUrl(sensorId));
     if (Array.isArray(response.data.items) && response.data.items.length > 0) {
-      return response.data.items[0].contractAddress;
+      const sensor = response.data.items[0];
+      sensorKeys[sensorId] = sensor.contractAddress;
+      return sensor.contractAddress;
     } else {
       throw new Error('Sensor not found');
     }

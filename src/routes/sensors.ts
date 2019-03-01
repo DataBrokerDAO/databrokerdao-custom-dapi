@@ -13,10 +13,9 @@ export async function sensorDataRoute(req: Request, res: Response) {
   const sensorId = req.body.key;
   const sensor = req.body;
   if (typeof sensor.key === 'undefined') {
+    console.log('Error!');
     return res.sendStatus(400);
   }
-
-  await authenticate();
 
   // TODO: change get sensor by ID by the endpoint given by PJ in slack
   // TODO: why do you need it? because you need to go from sensorid => sensor.key (which is the smart contract address)
@@ -45,20 +44,20 @@ export async function sensorDataRoute(req: Request, res: Response) {
   //   return res.sendStatus(200);
   // }
 
-  // TODO: attachment now becomes the data packet sent through the request body
-  let attachments: Attachment[];
+  // // TODO: attachment now becomes the data packet sent through the request body
+  // let attachments: Attachment[];
 
-  const data = JSON.stringify(sensor);
-  const content = Buffer.from(data).toString('base64');
-  attachments = [
-    {
-      contentType: 'text',
-      filename: 'sensorupdate',
-      content
-    }
-  ];
-
+  // const data = JSON.stringify(sensor);
+  // const content = Buffer.from(data).toString('base64');
+  // attachments = [
+  //   {
+  //     contentType: 'text',
+  //     filename: 'sensorupdate',
+  //     content
+  //   }
+  // ];
   // TODO: re-enable
-  await sendSensorUpdate(sensor, attachments);
-  return res.sendStatus(200);
+  // await sendSensorUpdate(sensor, attachments);
+  // return res.sendStatus(200);
+  console.log(`${sensorId} succesfully executed!`);
 }

@@ -1,10 +1,12 @@
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import bodyParser = require('body-parser');
+import { CronJob } from 'cron';
 import express from 'express';
 import {
   DATABROKER_DAPI_BASE_URL,
   MIDDLEWARE_PORT
 } from './config/dapi-config';
+import { sensorPurchaseCron } from './crons/purchases';
 import { authenticate } from './dapi/auth';
 import { updateSensorKeys } from './dapi/registries';
 import { unsubscribeRoute } from './mail/unsubscribe';
@@ -37,6 +39,15 @@ async function init() {
   // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
   // TODO: What if a sensor is not defined in cache?
   updateSensorKeys();
+  sensorPurchaseCron();
+
+  new CronJob(
+    '* */1 * * *',
+    sensorPurchaseCron,
+    sensorPurchaseCron,
+    true,
+    'Europe/Brussels'
+  ).start();
 }
 
 // async function handlePurchase(purchase) {
@@ -124,5 +135,5 @@ async function init() {
 //   }
 // }
 
-bootstrap();
+// bootstrap();
 init();

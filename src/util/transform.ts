@@ -1,11 +1,27 @@
-import { IDapiSensor } from '../types';
+import { IDapiSensor, IPurchase } from '../types';
 
-export async function transformSensorsToSensorsIdKeyPair(
-  sensors: IDapiSensor[]
-) {
+export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
   const sensorIdKeyPair = {};
   for (const sensor of sensors) {
     sensorIdKeyPair[sensor.sensorid] = sensor.contractAddress;
   }
   return sensorIdKeyPair;
+}
+
+export function transformSensorPurchasesToSensorKeyPurchases(
+  purchases: IPurchase[]
+) {
+  const sensorPurchases = {};
+  for (const sensorPurchase of purchases) {
+    if (sensorPurchase[sensorPurchase.sensor] === undefined) {
+      sensorPurchase[sensorPurchase.sensor] = [];
+    }
+    const newSensorPurchase = {
+      email: sensorPurchase.email,
+      endtime: sensorPurchase.endtime
+    };
+
+    sensorPurchase[sensorPurchase.sensor].push(newSensorPurchase);
+  }
+  return sensorPurchases;
 }
