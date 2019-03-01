@@ -1,6 +1,7 @@
+import { ISensor } from '../../types';
 import mailer from '../mailer';
 
-export async function send(recipient: string, sensor) {
+export async function send(recipient: string, sensor: ISensor) {
   const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
   const subject = `Sensor Registration '${sensor.name}'`;
   const globalMergeVars = getGlobalMergeVars(sensor);

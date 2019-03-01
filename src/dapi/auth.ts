@@ -18,6 +18,7 @@ export async function authenticate() {
         }
       );
       authToken = response.data.jwtToken;
+      axios.defaults.headers.common.Authorization = authToken;
     }
     return authToken;
   } catch (error) {

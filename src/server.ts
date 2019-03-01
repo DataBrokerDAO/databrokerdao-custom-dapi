@@ -1,6 +1,10 @@
+import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import bodyParser = require('body-parser');
 import express from 'express';
-import { MIDDLEWARE_PORT } from './config/dapi-config';
+import {
+  DATABROKER_DAPI_BASE_URL,
+  MIDDLEWARE_PORT
+} from './config/dapi-config';
 import { authenticate } from './dapi/auth';
 import { updateSensorKeys } from './dapi/registries';
 import { unsubscribeRoute } from './mail/unsubscribe';
@@ -27,11 +31,12 @@ function bootstrap() {
 }
 
 async function init() {
-  const authToken = await authenticate();
+  axios.defaults.baseURL = DATABROKER_DAPI_BASE_URL;
+  await authenticate();
   // Loads the sensorkeys to cache
   // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
   // TODO: What if a sensor is not defined in cache?
-  updateSensorKeys(authToken);
+  updateSensorKeys();
 }
 
 // async function handlePurchase(purchase) {
