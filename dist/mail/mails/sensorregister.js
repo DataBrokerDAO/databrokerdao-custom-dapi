@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mailer_1 = __importDefault(require("../mailer"));
-require('dotenv').config();
 async function send(recipient, sensor) {
     const emailFrom = 'Databroker DAO <dao@databrokerdao.com>';
     const subject = `Sensor Registration '${sensor.name}'`;

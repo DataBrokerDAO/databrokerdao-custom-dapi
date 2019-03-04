@@ -1,14 +1,17 @@
+import { setApiKey as sendgridSetApiKey } from '@sendgrid/mail';
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import bodyParser = require('body-parser');
 import { CronJob } from 'cron';
 import express from 'express';
 import {
   DATABROKER_DAPI_BASE_URL,
-  MIDDLEWARE_PORT
+  MIDDLEWARE_PORT,
+  SENDGRID_API_KEY
 } from './config/dapi-config';
 import { sensorPurchaseCron } from './crons/purchases';
 import { authenticate } from './dapi/auth';
-import { updateSensorKeys } from './dapi/registries';
+import { updateSensorAddresses } from './dapi/registries';
+import { send } from './mail/mailer';
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './routes/sensors';
 
@@ -34,15 +37,27 @@ function bootstrap() {
 
 async function init() {
   axios.defaults.baseURL = DATABROKER_DAPI_BASE_URL;
+  sendgridSetApiKey(SENDGRID_API_KEY);
+  // send(
+  //   'skibidi@wapapaaw.ski',
+  //   'vitanick2048@gmail.com',
+  //   'wapapaaaw',
+  //   'd-f64e42a4c8f940a0ba45e4daaec286a6',
+  //   {
+  //     sensor_name: 'PM10',
+  //     current_year: 2019,
+  //     subject: 'Banaan'
+  //   }
+  // );
   await authenticate();
   // Loads the sensorkeys to cache
   // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
   // TODO: What if a sensor is not defined in cache?
-  updateSensorKeys();
+  updateSensorAddresses();
   sensorPurchaseCron();
 
   new CronJob(
-    '* */1 * * *',
+    '* */10 * * *',
     sensorPurchaseCron,
     sensorPurchaseCron,
     true,
@@ -135,5 +150,5 @@ async function init() {
 //   }
 // }
 
-// bootstrap();
+bootstrap();
 init();

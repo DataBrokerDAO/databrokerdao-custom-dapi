@@ -10,7 +10,7 @@ async function unsubscribeRoute(req, res) {
     }
     await validate_1.validateUnsubscribe(requestContent, res);
     try {
-        const unsubscribeUrl = `${dapi_config_1.DAPP_BASE_URL}/unsubscribed`;
+        const unsubscribeUrl = `${dapi_config_1.DATABROKER_DAPP_BASE_URL}/unsubscribed`;
         res.redirect(unsubscribeUrl);
     }
     catch (error) {

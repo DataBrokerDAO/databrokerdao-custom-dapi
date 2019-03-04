@@ -1,6 +1,6 @@
 export interface IAttachment {
   type: string;
-  name: string;
+  filename: string;
   content: string;
 }
 
@@ -13,7 +13,7 @@ export interface ISensor {
 }
 
 export interface IPurchase {
-  endtime: number;
+  endTime: number;
   sensor: string;
   email: string;
 }
@@ -31,4 +31,10 @@ export interface IMergeVar {
 export interface IDapiSensor {
   contractAddress: string;
   sensorid: string;
+}
+
+export interface ITemplateData {
+  sensor_name: string;
+  current_year: number;
+  subject: string;
 }

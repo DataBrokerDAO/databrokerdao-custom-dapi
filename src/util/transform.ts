@@ -18,7 +18,8 @@ export function transformSensorPurchasesToSensorKeyPurchases(
     }
     const newSensorPurchase = {
       email: sensorPurchase.email,
-      endtime: sensorPurchase.endtime
+      endtime: sensorPurchase.endTime,
+      sensor: sensorPurchase.sensor
     };
 
     sensorPurchase[sensorPurchase.sensor].push(newSensorPurchase);

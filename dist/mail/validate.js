@@ -19,6 +19,6 @@ function isValidEmail(email) {
 }
 function isValidInput(sensorId) {
     const sensorIdParts = sensorId.split(dapi_config_1.DELIMITER_SENSOR);
-    return (sensorId !== undefined && sensorId !== null && sensorIdParts.length == 3);
+    return (sensorId !== undefined && sensorId !== null && sensorIdParts.length === 3);
 }
 //# sourceMappingURL=validate.js.map

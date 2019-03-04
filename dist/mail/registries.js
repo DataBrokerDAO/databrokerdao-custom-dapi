@@ -4,8 +4,8 @@ const client_1 = require("../services/mongo/client");
 async function subscribe(email, sensorid) {
     const collection = await client_1.getCollection('mailregistry');
     const subscription = {
-        email: email,
-        sensorid: sensorid,
+        email,
+        sensorid,
         status: 'subscribed'
     };
     await collection.insert(subscription);
@@ -16,9 +16,9 @@ async function unsubscribe(email, sensorid) {
     const collection = await client_1.getCollection('mailregistry');
     if (sensorid) {
         await collection.updateOne({
-            email: email,
+            email,
             status: 'subscribed',
-            sensorid: sensorid
+            sensorid
         }, {
             $set: {
                 status: 'unsubscribed'
@@ -27,7 +27,7 @@ async function unsubscribe(email, sensorid) {
     }
     else {
         await collection.updateMany({
-            email: email
+            email
         }, {
             $set: {
                 status: 'unsubscribed'
@@ -39,8 +39,8 @@ exports.unsubscribe = unsubscribe;
 async function isSubscribed(email, sensorid) {
     const collection = await client_1.getCollection('mailregistry');
     const record = await collection.findOne({
-        email: email,
-        sensorid: sensorid,
+        email,
+        sensorid,
         status: 'subscribed'
     });
     return typeof record !== 'undefined' && record !== null;

@@ -1,11 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const lib_crypto_1 = require("@settlemint/lib-crypto");
 const store_1 = require("../../services/mongo/store");
 const mailer_1 = require("../mailer");
 const registries_1 = require("../registries");
-const lib_crypto_1 = require("@settlemint/lib-crypto");
 const DELIMITER = '||';
-require('dotenv').config();
 async function send(sensor, attachments) {
     const recipients = await getRecipients(sensor);
     if (recipients.length === 0) {
@@ -26,8 +25,8 @@ async function getRecipients(sensor) {
     const isSubscribed = (email, sensorid) => {
         return registries_1.isSubscribed(email, sensorid);
     };
-    let emailTo = [];
-    let purchases = await store_1.getPurchasesForSensorKey(sensor.key);
+    const emailTo = [];
+    const purchases = await store_1.getPurchasesForSensorKey(sensor.key);
     for (let i = 0; i < purchases.length; i++) {
         // Fallback for purchases that still have email not encrypted.
         let email;
@@ -67,7 +66,7 @@ function getGlobalMergeVars(sensor) {
     ];
 }
 function getMergeVars(sensor, recipients) {
-    let mergeVars = [];
+    const mergeVars = [];
     for (let i = 0; i < recipients.length; i++) {
         mergeVars.push({
             rcpt: recipients[i],

@@ -3,23 +3,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const axios_1 = __importDefault(require("axios"));
 const bodyParser = require("body-parser");
+const cron_1 = require("cron");
+const express_1 = __importDefault(require("express"));
+const dapi_config_1 = require("./config/dapi-config");
+const purchases_1 = require("./crons/purchases");
+const auth_1 = require("./dapi/auth");
+const registries_1 = require("./dapi/registries");
 const unsubscribe_1 = require("./mail/unsubscribe");
-const sensors_1 = require("./sensors/sensors");
+const sensors_1 = require("./routes/sensors");
 exports.app = express_1.default();
-exports.app.use(bodyParser);
+exports.app.use(bodyParser.json());
 exports.app.get('/debug', unsubscribe_1.unsubscribeRoute);
-exports.app.post('/sensors/data', sensors_1.sensorDataRoute);
+exports.app.post('/sensor/data', sensors_1.sensorDataRoute);
 function bootstrap() {
-    exports.app.listen(process.env.MIDDLEWARE_PORT, () => {
-        console.log(`Listening on port ${process.env.MIDDLEWARE_PORT}`);
+    exports.app.listen(dapi_config_1.MIDDLEWARE_PORT, () => {
+        console.log(`Listening on port ${dapi_config_1.MIDDLEWARE_PORT}`);
+        // TODO: replace this by purchase CRON
         // watch('purchaseregistry-items', (data: {}) => {
         //   if (data.operationType === 'insert') {
         //     handlePurchase(data.fullDocument);
         //   }
         // });
     });
+}
+async function init() {
+    axios_1.default.defaults.baseURL = dapi_config_1.DATABROKER_DAPI_BASE_URL;
+    await auth_1.authenticate();
+    // Loads the sensorkeys to cache
+    // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
+    // TODO: What if a sensor is not defined in cache?
+    registries_1.updateSensorKeys();
+    purchases_1.sensorPurchaseCron();
+    new cron_1.CronJob('* */10 * * *', purchases_1.sensorPurchaseCron, purchases_1.sensorPurchaseCron, true, 'Europe/Brussels').start();
 }
 // async function handlePurchase(purchase) {
 //   const sensor = await getSensorForKey(purchase.sensor);
@@ -100,4 +117,5 @@ function bootstrap() {
 //   }
 // }
 bootstrap();
+init();
 //# sourceMappingURL=server.js.map

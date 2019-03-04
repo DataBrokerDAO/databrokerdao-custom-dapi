@@ -2,12 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const dapi_config_1 = require("../../config/dapi-config");
+// TODO: Remove this
 let client;
 let db;
 async function init() {
-    connectDb();
+    connect();
 }
-async function connectDb() {
+async function connect() {
     if (!client) {
         try {
             client = await mongodb_1.MongoClient.connect(dapi_config_1.MONGO_DB_URL, {
@@ -22,27 +23,27 @@ async function connectDb() {
     }
     return client;
 }
-async function getDb() {
+async function get() {
     if (!db) {
-        await connectDb();
+        await connect();
     }
     return db;
 }
-exports.getDb = getDb;
-async function getDbCollection(collectionName) {
-    const db = await getDb();
+exports.get = get;
+async function getCollection(collectionName) {
+    await get();
     return db.collection(collectionName);
 }
-exports.getDbCollection = getDbCollection;
-async function listDbCollections() {
-    const db = await getDb();
+exports.getCollection = getCollection;
+async function listCollections() {
+    await get();
     return db.collections();
 }
-exports.listDbCollections = listDbCollections;
-async function createDbCollection(collectionName) {
-    const db = await getDb();
+exports.listCollections = listCollections;
+async function createCollection(collectionName) {
+    await get();
     return db.createCollection(collectionName);
 }
-exports.createDbCollection = createDbCollection;
+exports.createCollection = createCollection;
 init();
 //# sourceMappingURL=client.js.map

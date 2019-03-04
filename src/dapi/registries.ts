@@ -1,28 +1,47 @@
 import axios from 'axios';
+import set = require('lodash.set');
 import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 
-let sensorKeys: { [index: string]: string } = {};
+// tslint:disable-next-line:interface-over-type-literal
+type Dict<T> = { [key: string]: T };
+type Map = Dict<boolean>;
 
-export async function getSensorKeyForSensorId(sensorId: string) {
-  const sensorKey = sensorKeys[sensorId]; // || (await querySensorKeyById(sensorId));
-  console.log(sensorKey);
-  return sensorKey;
+const sensorIdToAddress: Dict<Map> = {};
+
+export async function getSensorAddressesForSensorId(
+  sensorId: string
+): Promise<string[]> {
+  return sensorIdToAddress[sensorId]
+    ? Object.keys(sensorIdToAddress[sensorId])
+    : querySensorAddressById(sensorId);
 }
 
-export async function updateSensorKeys() {
+export async function updateSensorAddresses() {
   console.log('Updating sensorkeys');
   const sensors = await getSensors();
-  sensorKeys = transformSensorsToSensorsIdKeyPair(sensors);
+  for (const sensor of sensors) {
+    set(
+      sensorIdToAddress,
+      `${sensor.sensorid}.${sensor.contractAddress.toLowerCase()}`,
+      true
+    );
+  }
   console.log('Finished fetching sensorkeys');
 }
 
-async function querySensorKeyById(sensorId: string) {
+// TODO: Fix this so that id is correct when getting from sensors
+async function querySensorAddressById(sensorId: string) {
   try {
     const response = await axios.get(buildSensorQueryUrl(sensorId));
     if (Array.isArray(response.data.items) && response.data.items.length > 0) {
-      const sensor = response.data.items[0];
-      sensorKeys[sensorId] = sensor.contractAddress;
-      return sensor.contractAddress;
+      for (const sensor of response.data.items) {
+        set(
+          sensorIdToAddress,
+          `${sensor.sensorid}.${sensor.contractAddress.toLowerCase()}`,
+          true
+        );
+      }
+      return Object.keys(sensorIdToAddress[sensorId]);
     } else {
       throw new Error('Sensor not found');
     }

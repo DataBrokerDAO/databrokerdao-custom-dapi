@@ -23,13 +23,23 @@ async function getSensorPurchases() {
   }
 }
 
-// TODO: Implement caching to avoid dos issues on the server?
-export async function getSensorPurchasesForSensorKey(sensorId: string) {
+export async function getSensorPurchasesForSensorKey(
+  sensorId: string
+): Promise<IPurchase[]> {
   console.log(`Fetching sensorpurchase for ${sensorId}`);
-  const sensorPurchases =
-    purchaseDictionary[sensorId] ||
-    (await querySensorPurchasesForSensorKey(sensorId));
-  return sensorPurchases;
+
+  if (purchaseDictionary[sensorId] === undefined) {
+    const purchases = await querySensorPurchasesForSensorKey(sensorId);
+    purchaseDictionary[sensorId] = [];
+    for (const purchase of purchases.items) {
+      purchaseDictionary[sensorId].push({
+        email: purchase.email,
+        endTime: purchase.endTime,
+        sensor: purchase.sensor
+      });
+    }
+  }
+  return purchaseDictionary[sensorId] || [];
 }
 
 export async function querySensorPurchasesForSensorKey(sensorId: string) {
