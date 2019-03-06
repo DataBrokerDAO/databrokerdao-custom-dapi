@@ -10,7 +10,7 @@ import {
 } from './config/dapi-config';
 import { sensorPurchaseCron } from './crons/purchases';
 import { authenticate } from './dapi/auth';
-import { updateSensorAddresses } from './dapi/registries';
+import { updateSensorAddresses } from './dapi/sensorRegistry';
 import { send } from './mail/mailer';
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './routes/sensors';
@@ -19,40 +19,24 @@ export const app = express();
 
 app.use(bodyParser.json());
 
-app.get('/debug', unsubscribeRoute);
+app.get('/debug', (req, res, next) => {
+  res.send('Running').status(200);
+});
 
 app.post('/sensor/data', sensorDataRoute);
+
+app.get('/unsubscribe', unsubscribeRoute);
 
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
     console.log(`Listening on port ${MIDDLEWARE_PORT}`);
-    // TODO: replace this by purchase CRON
-    // watch('purchaseregistry-items', (data: {}) => {
-    //   if (data.operationType === 'insert') {
-    //     handlePurchase(data.fullDocument);
-    //   }
-    // });
   });
 }
 
 async function init() {
   axios.defaults.baseURL = DATABROKER_DAPI_BASE_URL;
   sendgridSetApiKey(SENDGRID_API_KEY);
-  // send(
-  //   'skibidi@wapapaaw.ski',
-  //   'vitanick2048@gmail.com',
-  //   'wapapaaaw',
-  //   'd-f64e42a4c8f940a0ba45e4daaec286a6',
-  //   {
-  //     sensor_name: 'PM10',
-  //     current_year: 2019,
-  //     subject: 'Banaan'
-  //   }
-  // );
   await authenticate();
-  // Loads the sensorkeys to cache
-  // TODO: Sould be updated each few hours, undefined issues at startup but should be no problem after startup
-  // TODO: What if a sensor is not defined in cache?
   updateSensorAddresses();
   sensorPurchaseCron();
 

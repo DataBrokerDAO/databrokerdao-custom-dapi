@@ -27,9 +27,7 @@ export async function send(
     attachments
   };
   try {
-    console.log('Succesfull till here!');
     await sendGridSend(msg);
-    console.log('Wooow');
   } catch (error) {
     throw error;
   }

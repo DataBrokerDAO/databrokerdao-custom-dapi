@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IPurchase } from '../types';
+import { IPurchase, IRawPurchase } from '../types';
 import { transformSensorPurchasesToSensorKeyPurchases } from '../util/transform';
 
 let purchaseDictionary: { [index: string]: IPurchase[] } = {};
@@ -23,29 +23,25 @@ async function getSensorPurchases() {
   }
 }
 
-export async function getSensorPurchasesForSensorKey(
-  sensorId: string
-): Promise<IPurchase[]> {
+export async function getSensorPurchasesForSensorKey(sensorId: string) {
   console.log(`Fetching sensorpurchase for ${sensorId}`);
 
   if (purchaseDictionary[sensorId] === undefined) {
-    const purchases = await querySensorPurchasesForSensorKey(sensorId);
+    const purchases: IRawPurchase[] = await querySensorPurchasesForSensorKey(
+      sensorId
+    );
     purchaseDictionary[sensorId] = [];
-    for (const purchase of purchases.items) {
-      purchaseDictionary[sensorId].push({
-        email: purchase.email,
-        endTime: purchase.endTime,
-        sensor: purchase.sensor
-      });
-    }
+    purchaseDictionary = await transformSensorPurchasesToSensorKeyPurchases(
+      purchases
+    );
   }
-  return purchaseDictionary[sensorId] || [];
+  return purchaseDictionary[sensorId];
 }
 
 export async function querySensorPurchasesForSensorKey(sensorId: string) {
   try {
     const response = await axios.get(buildSensorKeyUrl(sensorId));
-    return response.data;
+    return response.data.items;
   } catch (error) {
     throw error;
   }

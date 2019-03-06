@@ -29,7 +29,6 @@ export async function updateSensorAddresses() {
   console.log('Finished fetching sensorkeys');
 }
 
-// TODO: Fix this so that id is correct when getting from sensors
 async function querySensorAddressById(sensorId: string) {
   try {
     const response = await axios.get(buildSensorQueryUrl(sensorId));

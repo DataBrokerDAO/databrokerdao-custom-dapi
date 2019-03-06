@@ -13,6 +13,7 @@ export interface ISensor {
 }
 
 export interface IPurchase {
+  startTime: number;
   endTime: number;
   sensor: string;
   email: string;
@@ -37,4 +38,11 @@ export interface ITemplateData {
   sensor_name: string;
   current_year: number;
   subject: string;
+}
+
+export interface IRawPurchase {
+  startTime: number;
+  endTime: number;
+  sensor: string;
+  email: string;
 }

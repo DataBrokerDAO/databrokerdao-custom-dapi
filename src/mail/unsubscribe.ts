@@ -5,6 +5,7 @@ import {
 } from '../config/dapi-config';
 import { validateUnsubscribe } from './validate';
 
+
 export async function unsubscribeRoute(req: Request, res: Response) {
   const hash = new Buffer(req.query.hash, 'base64').toString('utf8');
 

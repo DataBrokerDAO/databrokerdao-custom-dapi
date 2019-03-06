@@ -1,4 +1,4 @@
-import { IDapiSensor, IPurchase } from '../types';
+import { IDapiSensor, IPurchase, IRawPurchase } from '../types';
 
 export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
   const sensorIdKeyPair = {};
@@ -9,20 +9,20 @@ export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
 }
 
 export function transformSensorPurchasesToSensorKeyPurchases(
-  purchases: IPurchase[]
+  purchases: IRawPurchase[]
 ) {
   const sensorPurchases = {};
   for (const sensorPurchase of purchases) {
-    if (sensorPurchase[sensorPurchase.sensor] === undefined) {
-      sensorPurchase[sensorPurchase.sensor] = [];
+    if (sensorPurchases[sensorPurchase.sensor] === undefined) {
+      sensorPurchases[sensorPurchase.sensor] = [];
     }
     const newSensorPurchase = {
+      startTime: sensorPurchase.startTime,
       email: sensorPurchase.email,
-      endtime: sensorPurchase.endTime,
+      endTime: sensorPurchase.endTime,
       sensor: sensorPurchase.sensor
     };
-
-    sensorPurchase[sensorPurchase.sensor].push(newSensorPurchase);
+    sensorPurchases[sensorPurchase.sensor].push(newSensorPurchase);
   }
   return sensorPurchases;
 }
