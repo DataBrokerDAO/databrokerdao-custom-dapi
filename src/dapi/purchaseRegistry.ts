@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { IPurchase, IRawPurchase } from '../types';
+import { isEmail } from 'validator';
+import { getCollection } from '../services/mongo/client';
+import { IPurchase, IRawPurchase, ISubscriber } from '../types';
 import { transformSensorPurchasesToSensorKeyPurchases } from '../util/transform';
 
 let purchaseDictionary: { [index: string]: IPurchase[] } = {};
@@ -10,13 +12,12 @@ export async function updateSensorPurchases() {
   purchaseDictionary = transformSensorPurchasesToSensorKeyPurchases(
     sensorPurchases
   );
+  addNotSubscribedUsersToDb(purchaseDictionary);
 }
 
 async function getSensorPurchases() {
   try {
-    console.log('Fetching sensorpurchases');
     const response = await axios.get(`/purchaseregistry/list?abi=false`);
-    console.log('Finished fetching sensorpurchases');
     return response.data.items;
   } catch (error) {
     throw error;
@@ -35,6 +36,7 @@ export async function getSensorPurchasesForSensorKey(sensorId: string) {
       purchases
     );
   }
+  addNotSubscribedUsersToDb(purchaseDictionary);
   return purchaseDictionary[sensorId];
 }
 
@@ -49,4 +51,31 @@ export async function querySensorPurchasesForSensorKey(sensorId: string) {
 
 function buildSensorKeyUrl(sensorId: string) {
   return `/purchaseregistry/list?abi=false&item.sensor=~${sensorId}`;
+}
+
+async function addNotSubscribedUsersToDb(purchaseDict: {
+  [index: string]: IPurchase[];
+}) {
+  for (const sensorId of Object.keys(purchaseDict)) {
+    const sensorPurchases = purchaseDict[sensorId];
+    sensorPurchases.map(verifySubscription);
+    console.log(sensorPurchases);
+  }
+}
+
+async function verifySubscription(sensorPurchase: ISubscriber) {
+  const mailRegistry = await getCollection('mailregistry');
+  console.log(sensorPurchase);
+  if (isEmail(sensorPurchase.email)) {
+    const subscriptionDocument = await mailRegistry.findOne({
+      email: sensorPurchase.email
+    });
+    if (subscriptionDocument == null) {
+      mailRegistry.insertOne({
+        email: sensorPurchase.email,
+        blockedSensorSubscriptions: {},
+        blockAllSensorSubscriptions: false
+      });
+    }
+  }
 }

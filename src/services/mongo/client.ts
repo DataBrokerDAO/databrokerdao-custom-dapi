@@ -1,7 +1,6 @@
 import { Db, MongoClient } from 'mongodb';
 import { MONGO_DB_NAME, MONGO_DB_URL } from '../../config/dapi-config';
 
-// TODO: Remove this
 let client: MongoClient;
 let db: Db;
 

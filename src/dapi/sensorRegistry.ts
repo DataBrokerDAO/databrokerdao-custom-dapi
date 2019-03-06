@@ -1,6 +1,5 @@
 import axios from 'axios';
 import set = require('lodash.set');
-import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
 
 // tslint:disable-next-line:interface-over-type-literal
 type Dict<T> = { [key: string]: T };
@@ -17,7 +16,6 @@ export async function getSensorAddressesForSensorId(
 }
 
 export async function updateSensorAddresses() {
-  console.log('Updating sensorkeys');
   const sensors = await getSensors();
   for (const sensor of sensors) {
     set(
@@ -26,7 +24,6 @@ export async function updateSensorAddresses() {
       true
     );
   }
-  console.log('Finished fetching sensorkeys');
 }
 
 async function querySensorAddressById(sensorId: string) {

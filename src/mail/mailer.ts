@@ -4,10 +4,6 @@ import {
 } from '@sendgrid/mail';
 
 import { AttachmentData } from '@sendgrid/helpers/classes/attachment';
-
-import { MandrillTransport } from 'mandrill-nodemailer-transport';
-import nodemailer from 'nodemailer';
-import { Attachment } from 'nodemailer/lib/mailer';
 import { ITemplateData } from '../types';
 
 export async function send(

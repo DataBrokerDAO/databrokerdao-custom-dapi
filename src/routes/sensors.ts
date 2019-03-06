@@ -1,17 +1,8 @@
-import Axios from 'axios';
 import { Request, Response } from 'express';
-import { now } from 'moment';
-import { Attachment } from 'nodemailer/lib/mailer';
-import {
-  SENDGRID_FROM_EMAIL,
-  SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE
-} from '../config/dapi-config';
-import { authenticate } from '../dapi/auth';
 import { getSensorPurchasesForSensorKey } from '../dapi/purchaseRegistry';
 import { getSensorAddressesForSensorId } from '../dapi/sensorRegistry';
-import { sendSensorUpdate } from '../mail/mails/sensorupdate';
-import { IPurchase, ISensor } from '../types';
-import { transformSensorsToSensorsIdKeyPair } from '../util/transform';
+import { sendSensorUpdate } from '../mail/sensorupdate';
+import { IPurchase } from '../types';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   try {
@@ -28,7 +19,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
     if (sensorAddresses === undefined || sensorAddresses === []) {
       return res.sendStatus(404);
     }
-    console.log(sensorAddresses);
     for (const sensorAddress of sensorAddresses) {
       if (!sensor) {
         console.log(
@@ -37,18 +27,15 @@ export async function sensorDataRoute(req: Request, res: Response) {
         return res.sendStatus(404);
       }
 
-      // TODO: Is this allowed?
-      const purchases: any = await getSensorPurchasesForSensorKey(
-        sensorAddress
-      ).catch((error: never) => {
-        return res.sendStatus(500);
-      });
-      if (purchases !== undefined) {
-        console.log(purchases);
-        if (purchases.length > 0) {
-          console.log(purchases);
-        }
-        if (purchases.length === 0) {
+      let purchases: IPurchase[];
+      try {
+        purchases = await getSensorPurchasesForSensorKey(sensorAddress);
+      } catch (error) {
+        return res.sendStatus(424); // Failed Dependency
+      }
+
+      if (purchases) {
+        if (!purchases.length) {
           return res.sendStatus(200);
         }
         for (const purchase of purchases) {
@@ -57,8 +44,10 @@ export async function sensorDataRoute(req: Request, res: Response) {
             purchase,
             isSubscriptionValid(purchase)
           );
-          if (isSubscriptionValid(purchase) && isSubscribed) {
-            await sendSensorUpdate('vitanick2048@gmail.com', sensor);
+          console.log(sensor);
+          // TODO: Remove true/false
+          if (false || (isSubscriptionValid(purchase) && isSubscribed)) {
+            await sendSensorUpdate(purchase.email, sensor);
           }
         }
         console.log(`${sensorId} succesfully executed!`);
@@ -78,6 +67,7 @@ function isSubscriptionValid(purchase: IPurchase) {
 
   return isSubscriptionStarted && isSubscriptionNotEnded;
 }
-function isSubscribed(purchase: IPurchase) {
 
+function isSubscribed(purchase: IPurchase) {
+  // TODO move mongo
 }
