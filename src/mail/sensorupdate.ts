@@ -4,7 +4,7 @@ import {
   SENDGRID_FROM_EMAIL,
   SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE
 } from '../config/dapi-config';
-import { ISensor } from '../types';
+import { ISensor } from '../types/types';
 import { sendUpdate } from './mailer';
 
 export async function sendSensorUpdate(
@@ -12,13 +12,10 @@ export async function sendSensorUpdate(
   sensor: ISensor,
   sensorAddress: string
 ) {
-  // TODO: re-enable on deployment
-  // TODO: change harcoded email recepient
   const attachments = CreateSensorUpdateAttachment(sensor);
-  console.log(`Mail would have been send to ${email}`);
   sendUpdate(
     SENDGRID_FROM_EMAIL,
-    'vitanick2048@gmail.com',
+    email,
     'Sensor update',
     SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE,
     {

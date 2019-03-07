@@ -1,4 +1,4 @@
-import { IDapiSensor, IPurchase, IRawPurchase } from '../types';
+import { IDapiSensor, IPurchase, IRawPurchase } from '../types/types';
 
 export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
   const sensorIdKeyPair = {};

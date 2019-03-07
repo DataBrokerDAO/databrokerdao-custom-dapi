@@ -3,7 +3,7 @@ import { getSensorPurchasesForSensorKey } from '../dapi/purchaseRegistry';
 import { getSensorAddressesForSensorId } from '../dapi/sensorRegistry';
 import { sendSensorUpdate } from '../mail/sensorupdate';
 import { getCollection } from '../services/mongo/client';
-import { IPurchase } from '../types';
+import { IPurchase } from '../types/types';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   try {
@@ -11,7 +11,6 @@ export async function sensorDataRoute(req: Request, res: Response) {
     const sensorId = req.body.key;
     const sensor = req.body;
     if (typeof sensor.key === 'undefined') {
-      console.log('Error!');
       return res.sendStatus(400);
     }
 
@@ -40,15 +39,7 @@ export async function sensorDataRoute(req: Request, res: Response) {
           return res.sendStatus(200);
         }
         for (const purchase of purchases) {
-          console.log(
-            'Sending mail to another account for now',
-            purchase,
-            isSubscriptionValid(purchase)
-          );
-          console.log(sensor);
-          // TODO: Remove true/false
           if (
-            false ||
             (isSubscriptionValid(purchase) && isSubscribed(purchase))
           ) {
             await sendSensorUpdate(purchase.email, sensor, sensorAddress);
@@ -74,7 +65,6 @@ function isSubscriptionValid(purchase: IPurchase) {
 
 async function isSubscribed(sensorPurchase: IPurchase) {
   const mailRegistry = await getCollection('mailregistry');
-  console.log(sensorPurchase);
   const subscriptionDocument = await mailRegistry.findOne({
     email: sensorPurchase.email,
     status: 'subscribed',

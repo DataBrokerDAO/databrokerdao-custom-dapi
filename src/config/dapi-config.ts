@@ -31,11 +31,8 @@ export const SENDGRID_TEMPLATE_SLUG_SENSOR_REGISTRATION: string =
 export const SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS: string =
   process.env.SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS;
 
-// TODO: Remove this crap
 export const MONGO_DB_URL: string = rtrim(process.env.MONGO_DB_URL);
 export const MONGO_DB_NAME: string = process.env.MONGO_DB_NAME;
-// export const MONGO_DB_SENSOR_COLLECTION: string =
-//   process.env.MONGO_DB_SENSOR_COLLECTION;
 
 export const MIDDLEWARE_URL: string = rtrim(process.env.MIDDLEWARE_URL);
 export const MIDDLEWARE_PORT: number =

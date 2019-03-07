@@ -25,7 +25,7 @@ app.get('/debug', (req, res, next) => {
 app.post('/sensor/data', sensorDataRoute);
 
 app.get('/unsubscribe', unsubscribeRoute);
- 
+
 function bootstrap() {
   app.listen(MIDDLEWARE_PORT, () => {
     console.log(`Listening on port ${MIDDLEWARE_PORT}`);
