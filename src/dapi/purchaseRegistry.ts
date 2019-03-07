@@ -1,5 +1,10 @@
 import axios from 'axios';
 import { isEmail } from 'validator';
+import {
+  SENDGRID_FROM_EMAIL,
+  SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS
+} from '../config/dapi-config';
+import { sendPurchased } from '../mail/mailer';
 import { getCollection } from '../services/mongo/client';
 import { IPurchase, IRawPurchase, ISubscriber } from '../types';
 import { transformSensorPurchasesToSensorKeyPurchases } from '../util/transform';
@@ -8,7 +13,7 @@ let purchaseDictionary: { [index: string]: IPurchase[] } = {};
 
 export async function updateSensorPurchases() {
   const sensorPurchases = await getSensorPurchases();
-
+  console.log(sensorPurchases);
   purchaseDictionary = transformSensorPurchasesToSensorKeyPurchases(
     sensorPurchases
   );
@@ -63,19 +68,39 @@ async function addNotSubscribedUsersToDb(purchaseDict: {
   }
 }
 
-async function verifySubscription(sensorPurchase: ISubscriber) {
+async function verifySubscription(sensorPurchase: IRawPurchase) {
   const mailRegistry = await getCollection('mailregistry');
   console.log(sensorPurchase);
   if (isEmail(sensorPurchase.email)) {
     const subscriptionDocument = await mailRegistry.findOne({
-      email: sensorPurchase.email
+      email: sensorPurchase.email,
+      sensorid: sensorPurchase.sensor
     });
     if (subscriptionDocument == null) {
       mailRegistry.insertOne({
         email: sensorPurchase.email,
-        blockedSensorSubscriptions: {},
-        blockAllSensorSubscriptions: false
+        status: 'subscribed',
+        sensorid: sensorPurchase.sensor
       });
     }
   }
+}
+
+export async function sendSensorPurchaseRegisterd(
+  sensorPurchase: IRawPurchase
+) {
+  // TODO: re-enable on deployment
+  // TODO: change harcoded email recepient
+  console.log(`Mail would have been send to ${sensorPurchase.email}`);
+  sendPurchased(
+    SENDGRID_FROM_EMAIL,
+    'vitanick2048@gmail.com',
+    'Sensor update',
+    SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS,
+    {
+      sensor_name: sensorPurchase.sensor,
+      current_year: 2019,
+      subject: 'Sensor update'
+    }
+  );
 }

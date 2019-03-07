@@ -1,3 +1,4 @@
+import { getSensorAddressesForSensorId } from '../dapi/sensorRegistry';
 import { getCollection } from '../services/mongo/client';
 
 export async function subscribe(email: string, sensorid: string) {

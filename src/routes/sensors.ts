@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getSensorPurchasesForSensorKey } from '../dapi/purchaseRegistry';
 import { getSensorAddressesForSensorId } from '../dapi/sensorRegistry';
 import { sendSensorUpdate } from '../mail/sensorupdate';
+import { getCollection } from '../services/mongo/client';
 import { IPurchase } from '../types';
 
 export async function sensorDataRoute(req: Request, res: Response) {
@@ -46,8 +47,11 @@ export async function sensorDataRoute(req: Request, res: Response) {
           );
           console.log(sensor);
           // TODO: Remove true/false
-          if (false || (isSubscriptionValid(purchase) && isSubscribed)) {
-            await sendSensorUpdate(purchase.email, sensor);
+          if (
+            false ||
+            (isSubscriptionValid(purchase) && isSubscribed(purchase))
+          ) {
+            await sendSensorUpdate(purchase.email, sensor, sensorAddress);
           }
         }
         console.log(`${sensorId} succesfully executed!`);
@@ -68,6 +72,13 @@ function isSubscriptionValid(purchase: IPurchase) {
   return isSubscriptionStarted && isSubscriptionNotEnded;
 }
 
-function isSubscribed(purchase: IPurchase) {
-  // TODO move mongo
+async function isSubscribed(sensorPurchase: IPurchase) {
+  const mailRegistry = await getCollection('mailregistry');
+  console.log(sensorPurchase);
+  const subscriptionDocument = await mailRegistry.findOne({
+    email: sensorPurchase.email,
+    status: 'subscribed',
+    sensorid: sensorPurchase.sensor
+  });
+  return subscriptionDocument != null;
 }

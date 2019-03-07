@@ -22,9 +22,10 @@ export async function unsubscribeRoute(req: Request, res: Response) {
     res.sendStatus(400);
   }
   try {
-    await unsubscribe(email, sensorid) ;
+    console.log(email, sensorid);
+    await unsubscribe(email, sensorid);
     const unsubscribedUrl = `${DATABROKER_DAPP_BASE_URL}/unsubscribed`;
-    res.redirect(unsubscribedUrl);
+    // res.redirect(unsubscribedUrl);
   } catch (error) {
     res.send(error).status(200);
   }

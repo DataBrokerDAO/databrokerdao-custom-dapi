@@ -38,8 +38,8 @@ export interface ITemplateData {
   sensor_name: string;
   current_year: number;
   subject: string;
-  sensor_unsubscribe_single: string?;
-  sensor_unsubscribe_all: string?;
+  sensor_unsubscribe_single?: string;
+  sensor_unsubscribe_all?: string;
 }
 
 export interface IRawPurchase {
@@ -50,5 +50,7 @@ export interface IRawPurchase {
 }
 
 export interface ISubscriber {
-  email:string;
+  email: string;
+  sensorid: string;
+  status: string;
 }

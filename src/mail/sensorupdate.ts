@@ -5,14 +5,18 @@ import {
   SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE
 } from '../config/dapi-config';
 import { ISensor } from '../types';
-import { send as sendEmail } from './mailer';
+import { sendUpdate } from './mailer';
 
-export async function sendSensorUpdate(email: string, sensor: ISensor) {
+export async function sendSensorUpdate(
+  email: string,
+  sensor: ISensor,
+  sensorAddress: string
+) {
   // TODO: re-enable on deployment
   // TODO: change harcoded email recepient
   const attachments = CreateSensorUpdateAttachment(sensor);
   console.log(`Mail would have been send to ${email}`);
-  sendEmail(
+  sendUpdate(
     SENDGRID_FROM_EMAIL,
     'vitanick2048@gmail.com',
     'Sensor update',
@@ -21,7 +25,11 @@ export async function sendSensorUpdate(email: string, sensor: ISensor) {
       sensor_name: sensor.key,
       current_year: 2019,
       subject: 'Sensor update',
-      sensor_unsubscribe_single: getUnsubscribeSingleUrl(email, sensor),
+      sensor_unsubscribe_single: getUnsubscribeSingleUrl(
+        email,
+        sensor,
+        sensorAddress
+      ),
       sensor_unsubscribe_all: getUnsubscribeAllUrl(email)
     },
     attachments
@@ -41,9 +49,13 @@ function CreateSensorUpdateAttachment(sensor: ISensor) {
   return attachments;
 }
 
-function getUnsubscribeSingleUrl(email: string, sensor: ISensor) {
+function getUnsubscribeSingleUrl(
+  email: string,
+  sensor: ISensor,
+  sensorAddress: string
+) {
   const unsubscribeHash = Buffer.from(
-    `${email}${DELIMITER_HASH}${sensor.key}`
+    `${email}${DELIMITER_HASH}${sensorAddress}`
   ).toString('base64');
   const unsubscribeUrl = `${MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
