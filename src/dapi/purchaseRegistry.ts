@@ -40,7 +40,7 @@ export async function getSensorPurchasesForSensorKey(sensorId: string) {
     purchaseDictionary = await transformSensorPurchasesToSensorKeyPurchases(
       purchases
     );
-  }
+    }
   addNotSubscribedUsersToDb(purchaseDictionary);
   return purchaseDictionary[sensorId];
 }
@@ -82,6 +82,7 @@ async function verifySubscription(sensorPurchase: IRawPurchase) {
         status: 'subscribed',
         sensorid: sensorPurchase.sensor
       });
+      sendSensorPurchaseRegisterd(sensorPurchase);
     }
   }
 }
