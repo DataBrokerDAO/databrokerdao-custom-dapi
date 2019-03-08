@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const dapi_config_1 = require("../../config/dapi-config");
-// TODO: Remove this
 let client;
 let db;
 async function init() {

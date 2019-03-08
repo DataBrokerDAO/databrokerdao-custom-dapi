@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { getSensorPurchasesForSensorKey } from '../dapi/purchaseRegistry';
-import { getSensorAddressesForSensorId } from '../dapi/sensorRegistry';
+import {
+  getSensorAddressesForSensorId,
+  getSensorIdByAddress
+} from '../dapi/sensorRegistry';
 import { sendSensorUpdate } from '../mail/sensorupdate';
 import { getCollection } from '../services/mongo/client';
 import { IPurchase } from '../types/types';
@@ -39,10 +42,12 @@ export async function sensorDataRoute(req: Request, res: Response) {
           return res.sendStatus(200);
         }
         for (const purchase of purchases) {
-          if (
-            (isSubscriptionValid(purchase) && isSubscribed(purchase))
-          ) {
-            await sendSensorUpdate(purchase.email, sensor, sensorAddress);
+          if (isSubscriptionValid(purchase) && isSubscribed(purchase)) {
+            await sendSensorUpdate(
+              purchase.email,
+              sensor,
+              getSensorIdByAddress(sensorAddress)
+            );
           }
         }
         console.log(`${sensorId} succesfully executed!`);

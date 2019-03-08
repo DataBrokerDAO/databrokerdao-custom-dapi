@@ -11,14 +11,16 @@ exports.transformSensorsToSensorsIdKeyPair = transformSensorsToSensorsIdKeyPair;
 function transformSensorPurchasesToSensorKeyPurchases(purchases) {
     const sensorPurchases = {};
     for (const sensorPurchase of purchases) {
-        if (sensorPurchase[sensorPurchase.sensor] === undefined) {
-            sensorPurchase[sensorPurchase.sensor] = [];
+        if (sensorPurchases[sensorPurchase.sensor] === undefined) {
+            sensorPurchases[sensorPurchase.sensor] = [];
         }
         const newSensorPurchase = {
+            startTime: sensorPurchase.startTime,
             email: sensorPurchase.email,
-            endtime: sensorPurchase.endtime
+            endTime: sensorPurchase.endTime,
+            sensor: sensorPurchase.sensor
         };
-        sensorPurchase[sensorPurchase.sensor].push(newSensorPurchase);
+        sensorPurchases[sensorPurchase.sensor].push(newSensorPurchase);
     }
     return sensorPurchases;
 }

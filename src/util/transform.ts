@@ -8,7 +8,7 @@ export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
   return sensorIdKeyPair;
 }
 
-export function transformSensorPurchasesToSensorKeyPurchases(
+export function transformSensorPurchasesToSensorKeyPurchasesDict(
   purchases: IRawPurchase[]
 ) {
   const sensorPurchases = {};
@@ -25,4 +25,20 @@ export function transformSensorPurchasesToSensorKeyPurchases(
     sensorPurchases[sensorPurchase.sensor].push(newSensorPurchase);
   }
   return sensorPurchases;
+}
+
+export function transformSensorPurchasesToSensorPurchasesArray(
+  purchases: IRawPurchase[]
+) {
+  const newPurchases = [];
+  for (const purchase of purchases) {
+    const newPurchase: IPurchase = {
+      sensor: purchase.sensor,
+      email: purchase.email,
+      startTime: purchase.startTime,
+      endTime: purchase.endTime
+    };
+    newPurchases.push(newPurchase);
+  }
+  return newPurchases;
 }

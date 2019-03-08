@@ -36,8 +36,8 @@ async function init() {
   axios.defaults.baseURL = DATABROKER_DAPI_BASE_URL;
   sendgridSetApiKey(SENDGRID_API_KEY);
   await authenticate();
-  updateSensorAddresses();
-  updateSensorPurchases();
+  await updateSensorAddresses();
+  await updateSensorPurchases();
 
   new CronJob(
     '* */10 * * *',

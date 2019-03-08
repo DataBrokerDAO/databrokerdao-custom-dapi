@@ -14,14 +14,17 @@ export async function sendUpdate(
   dynamicTemplateData: ITemplateData,
   attachments: AttachmentData[]
 ) {
+  // TODO: Remove hardcodedreceiver
   const msg = {
-    to,
+    to: 'vitanick2048@gmail.com',
     from,
     subject,
     templateId,
     dynamic_template_data: dynamicTemplateData,
     attachments
   };
+  // TODO: Remove this
+  console.log(`Mail send to ${to}`);
   try {
     await sendGridSend(msg);
   } catch (error) {
@@ -36,13 +39,16 @@ export async function sendPurchased(
   templateId: string,
   dynamicTemplateData: ITemplateData
 ) {
+  // TODO: Remove hardcodedreceiver
   const msg = {
-    to,
+    to: 'vitanick2048@gmail.com',
     from,
     subject,
     templateId,
     dynamic_template_data: dynamicTemplateData
   };
+  // TODO: Remove this
+  console.log(`Mail send to ${to}`);
   try {
     await sendGridSend(msg);
   } catch (error) {

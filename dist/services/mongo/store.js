@@ -1,51 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const validator_1 = require("validator");
+const purchaseRegistry_1 = require("../../dapi/purchaseRegistry");
 const client_1 = require("./client");
-// TODO: remove
-async function watch(collectionName, handler) {
+async function getMailSubscribersBySensor(purchaseKey) {
     try {
-        const collection = await client_1.getCollection(collectionName);
-        collection.watch().on('change', handler);
-    }
-    catch (error) {
-        throw error;
-    }
-}
-exports.watch = watch;
-async function getSensorForKey(key) {
-    try {
-        const collection = await client_1.getCollection('sensorregistry-items');
-        return collection.findOne({ key });
-    }
-    catch (error) {
-        throw error;
-    }
-}
-exports.getSensorForKey = getSensorForKey;
-async function getSensorForSensorId(sensorid) {
-    try {
-        const collection = await client_1.getCollection('sensorregistry-items');
-        return collection.findOne({ sensorid });
-    }
-    catch (error) {
-        throw error;
-    }
-}
-exports.getSensorForSensorId = getSensorForSensorId;
-async function getPurchasesForSensorKey(sensorKey) {
-    try {
-        const collection = await client_1.getCollection('purchaseregistry-items');
-        const purchases = await collection.find({ sensor: sensorKey });
-        return purchases.toArray();
-    }
-    catch (error) {
-        throw error;
-    }
-}
-exports.getPurchasesForSensorKey = getPurchasesForSensorKey;
-async function getPurchasesForPurchaseKey(purchaseKey) {
-    try {
-        const collection = await client_1.getCollection('purchaseregistry-items');
+        const collection = await client_1.getCollection('mailRegistry');
         const purchases = await collection.find({ key: purchaseKey });
         return purchases.toArray();
     }
@@ -53,5 +13,29 @@ async function getPurchasesForPurchaseKey(purchaseKey) {
         throw error;
     }
 }
-exports.getPurchasesForPurchaseKey = getPurchasesForPurchaseKey;
+exports.getMailSubscribersBySensor = getMailSubscribersBySensor;
+async function addNotSubscribedUsersToDb(purchaseDict) {
+    for (const sensorId of Object.keys(purchaseDict)) {
+        const sensorPurchases = purchaseDict[sensorId];
+        sensorPurchases.map(verifySubscription);
+    }
+}
+exports.addNotSubscribedUsersToDb = addNotSubscribedUsersToDb;
+async function verifySubscription(sensorPurchase) {
+    const mailRegistry = await client_1.getCollection('mailregistry');
+    if (validator_1.isEmail(sensorPurchase.email)) {
+        const subscriptionDocument = await mailRegistry.findOne({
+            email: sensorPurchase.email,
+            sensorid: sensorPurchase.sensor
+        });
+        if (subscriptionDocument == null) {
+            mailRegistry.insertOne({
+                email: sensorPurchase.email,
+                status: 'subscribed',
+                sensorid: sensorPurchase.sensor
+            });
+            purchaseRegistry_1.sendSensorPurchaseRegistered(sensorPurchase);
+        }
+    }
+}
 //# sourceMappingURL=store.js.map

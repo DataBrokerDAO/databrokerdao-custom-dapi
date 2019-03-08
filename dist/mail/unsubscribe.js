@@ -1,17 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const validator = require("validator");
 const dapi_config_1 = require("../config/dapi-config");
-const validate_1 = require("./validate");
+const registries_1 = require("./registries");
 async function unsubscribeRoute(req, res) {
-    const hash = new Buffer(req.query.hash, 'base64').toString('utf8');
-    const requestContent = hash.split(dapi_config_1.DELIMITER_HASH);
-    if (requestContent.length < 1) {
+    const hash = Buffer.from(req.query.hash, 'base64').toString('utf8');
+    const parts = hash.split(dapi_config_1.DELIMITER_HASH);
+    if (parts.length < 1) {
         res.sendStatus(400);
     }
-    await validate_1.validateUnsubscribe(requestContent, res);
+    // Validate user input - email
+    const email = parts[0];
+    const sensorid = parts[1];
+    if (!validator.isEmail(email)) {
+        res.sendStatus(400);
+    }
     try {
-        const unsubscribeUrl = `${dapi_config_1.DATABROKER_DAPP_BASE_URL}/unsubscribed`;
-        res.redirect(unsubscribeUrl);
+        await registries_1.unsubscribe(email, sensorid);
+        const unsubscribedUrl = `${dapi_config_1.DATABROKER_DAPP_BASE_URL}/unsubscribed`;
+        res.redirect(unsubscribedUrl);
     }
     catch (error) {
         res.send(error).status(200);

@@ -6,6 +6,7 @@ type Dict<T> = { [key: string]: T };
 type Map = Dict<boolean>;
 
 const sensorIdToAddress: Dict<Map> = {};
+const sensorAddressToId: { [index: string]: string } = {};
 
 export async function getSensorAddressesForSensorId(
   sensorId: string
@@ -23,6 +24,7 @@ export async function updateSensorAddresses() {
       `${sensor.sensorid}.${sensor.contractAddress.toLowerCase()}`,
       true
     );
+    sensorAddressToId[sensor.contractAddress.toLowerCase()] = sensor.sensorid;
   }
 }
 
@@ -36,6 +38,8 @@ async function querySensorAddressById(sensorId: string) {
           `${sensor.sensorid}.${sensor.contractAddress.toLowerCase()}`,
           true
         );
+        sensorAddressToId[sensor.contractAddress.toLowerCase()] =
+          sensor.sensorid;
       }
       return Object.keys(sensorIdToAddress[sensorId]);
     } else {
@@ -44,6 +48,15 @@ async function querySensorAddressById(sensorId: string) {
   } catch (error) {
     throw error;
   }
+}
+
+// This will already be stored by updateSensorAddresses or querySensorAddressById
+export function getSensorIdByAddress(sensorAddress: string) {
+  console.log(
+    sensorAddressToId[sensorAddress.toLocaleLowerCase()],
+    sensorAddressToId
+  );
+  return sensorAddressToId[sensorAddress.toLocaleLowerCase()];
 }
 
 async function getSensors() {

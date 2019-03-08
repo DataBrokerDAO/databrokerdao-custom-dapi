@@ -1,39 +1,39 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mandrill_nodemailer_transport_1 = require("mandrill-nodemailer-transport");
-const nodemailer_1 = __importDefault(require("nodemailer"));
-let transporter;
-async function createTransporter() {
-    return nodemailer_1.default.createTransport(new mandrill_nodemailer_transport_1.MandrillTransport({
-        apiKey: process.env.MANDRILL_API_KEY
-    }));
-}
-async function send(emailFrom, emailTo, subject, attachments, globalMergeVars, mergeVars, templateSlug) {
-    if (typeof transporter === 'undefined') {
-        transporter = await createTransporter();
-    }
-    const options = {
-        from: emailFrom,
-        to: emailTo,
+const mail_1 = require("@sendgrid/mail");
+async function sendUpdate(from, to, subject, templateId, dynamicTemplateData, attachments) {
+    const msg = {
+        to,
+        from,
         subject,
-        mandrillOptions: {
-            template_name: templateSlug,
-            message: {
-                global_merge_vars: globalMergeVars,
-                merge_vars: mergeVars,
-                attachments
-            }
-        }
+        templateId,
+        dynamic_template_data: dynamicTemplateData,
+        attachments
     };
-    transporter.sendMail(options, (error, info) => {
-        if (error) {
-            return Promise.reject(error);
-        }
-        return Promise.resolve(info);
-    });
+    console.log(`Mail send to ${from}`);
+    try {
+        await mail_1.send(msg);
+    }
+    catch (error) {
+        throw error;
+    }
 }
-exports.send = send;
+exports.sendUpdate = sendUpdate;
+async function sendPurchased(from, to, subject, templateId, dynamicTemplateData) {
+    const msg = {
+        to,
+        from,
+        subject,
+        templateId,
+        dynamic_template_data: dynamicTemplateData
+    };
+    console.log(`Mail send to ${from}`);
+    try {
+        await mail_1.send(msg);
+    }
+    catch (error) {
+        throw error;
+    }
+}
+exports.sendPurchased = sendPurchased;
 //# sourceMappingURL=mailer.js.map
