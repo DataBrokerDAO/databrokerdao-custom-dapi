@@ -13,19 +13,26 @@ import {
 import { getSensorIdByAddress } from './sensorRegistry';
 
 let purchaseDictionary: { [index: string]: IPurchase[] } = {};
+let purchaseCount = 0;
 
 export async function updateSensorPurchases() {
-  const sensorPurchases = await getSensorPurchases();
-  purchaseDictionary = transformSensorPurchasesToSensorKeyPurchasesDict(
-    sensorPurchases
-  );
-  addNotSubscribedUsersToDb(purchaseDictionary);
+  const data = await getSensorPurchases();
+  if (purchaseCount < data.total) {
+    const sensorPurchases = data.items;
+    purchaseDictionary = transformSensorPurchasesToSensorKeyPurchasesDict(
+      sensorPurchases
+    );
+    purchaseCount = data.total;
+    addNotSubscribedUsersToDb(purchaseDictionary);
+  }
 }
 
 async function getSensorPurchases() {
   try {
-    const response = await axios.get(`/purchaseregistry/list?abi=false`);
-    return response.data.items;
+    const response = await axios.get(
+      `/purchaseregistry/list?abi=false&skip=${purchaseCount}`
+    );
+    return response.data;
   } catch (error) {
     throw error;
   }
