@@ -38,23 +38,6 @@ async function getSensorPurchases() {
   }
 }
 
-// TODO: Remove?
-// export async function getSensorPurchasesForSensorKey(sensorId: string) {
-//   console.log(`Fetching sensorpurchase for ${sensorId}`);
-
-//   if (purchaseDictionary[sensorId] === undefined) {
-//     const purchases: IRawPurchase[] = await querySensorPurchasesForSensorKey(
-//       sensorId
-//     );
-//     purchaseDictionary[sensorId] = [];
-//     purchaseDictionary = await transformSensorPurchasesToSensorKeyPurchasesDict(
-//       purchases
-//     );
-//   }
-//   addNotSubscribedUsersToDb(purchaseDictionary);
-//   return purchaseDictionary[sensorId];
-// }
-
 export async function getSensorPurchasesForSensorKey(sensorId: string) {
   try {
     const response = await axios.get(buildSensorKeyUrl(sensorId));
@@ -78,7 +61,9 @@ export async function sendSensorPurchaseRegistered(
   sendPurchased(
     SENDGRID_FROM_EMAIL,
     sensorPurchase.email,
-    'Sensor update',
+    `You successfully purchased '${getSensorIdByAddress(
+      sensorPurchase.sensor
+    )}'`,
     SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS,
     {
       sensor_name: getSensorIdByAddress(sensorPurchase.sensor),

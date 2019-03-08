@@ -5,6 +5,7 @@ import {
   DELIMITER_HASH
 } from '../config/dapi-config';
 import { unsubscribe } from './registries';
+import { validateUnsubscribe } from './validate';
 
 export async function unsubscribeRoute(req: Request, res: Response) {
   const hash = Buffer.from(req.query.hash, 'base64').toString('utf8');
@@ -20,6 +21,7 @@ export async function unsubscribeRoute(req: Request, res: Response) {
     res.sendStatus(400);
   }
   try {
+    validateUnsubscribe(parts, res);
     await unsubscribe(email, sensorid);
     const unsubscribedUrl = `${DATABROKER_DAPP_BASE_URL}/unsubscribed`;
     res.redirect(unsubscribedUrl);

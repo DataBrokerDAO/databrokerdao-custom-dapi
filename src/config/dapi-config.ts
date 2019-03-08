@@ -4,7 +4,7 @@ import rtrim from 'rtrim';
 dotenv.load();
 
 export const DELIMITER_HASH: string = '||';
-export const DELIMITER_SENSOR: string = '!#!';
+export const DELIMITER_SENSOR: string = '!##!';
 
 export const DATABROKER_DAPP_BASE_URL: string = rtrim(
   process.env.DATABROKER_DAPP_BASE_URL

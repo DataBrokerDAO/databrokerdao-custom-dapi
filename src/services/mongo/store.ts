@@ -1,5 +1,6 @@
 import { isEmail } from 'validator';
 import { sendSensorPurchaseRegistered } from '../../dapi/purchaseRegistry';
+import { getSensorIdByAddress } from '../../dapi/sensorRegistry';
 import { IPurchase, IRawPurchase, ISubscriber } from '../../types/types';
 import { getCollection } from './client';
 
@@ -29,13 +30,15 @@ async function verifySubscription(sensorPurchase: IRawPurchase) {
   if (isEmail(sensorPurchase.email)) {
     const subscriptionDocument = await mailRegistry.findOne({
       email: sensorPurchase.email,
-      sensorid: sensorPurchase.sensor
+      sensorid: getSensorIdByAddress(sensorPurchase.sensor.toLocaleLowerCase())
     });
     if (subscriptionDocument == null) {
       mailRegistry.insertOne({
         email: sensorPurchase.email,
         status: 'subscribed',
-        sensorid: sensorPurchase.sensor
+        sensorid: getSensorIdByAddress(
+          sensorPurchase.sensor.toLocaleLowerCase()
+        )
       });
       sendSensorPurchaseRegistered(sensorPurchase);
     }

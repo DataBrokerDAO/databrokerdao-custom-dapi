@@ -6,7 +6,7 @@ import {
 } from '../dapi/sensorRegistry';
 import { sendSensorUpdate } from '../mail/sensorupdate';
 import { getCollection } from '../services/mongo/client';
-import { IPurchase } from '../types/types';
+import { IPurchase, ISensor } from '../types/types';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   try {
@@ -16,46 +16,49 @@ export async function sensorDataRoute(req: Request, res: Response) {
     if (typeof sensor.key === 'undefined') {
       return res.sendStatus(400);
     }
+    let sensorAddresses: string[];
 
     // Return early if there are no purchases
-    const sensorAddresses = await getSensorAddressesForSensorId(sensorId);
-    if (sensorAddresses === undefined || sensorAddresses === []) {
-      return res.sendStatus(404);
-    }
-    for (const sensorAddress of sensorAddresses) {
-      if (!sensor) {
-        console.log(
-          `Could not find sensor ${sensorId}, possible race condition`
-        );
-        return res.sendStatus(404);
-      }
-
-      let purchases: IPurchase[];
-      try {
-        purchases = await getSensorPurchasesForSensorKey(sensorAddress);
-      } catch (error) {
-        return res.sendStatus(424); // Failed Dependency
-      }
-
-      if (purchases) {
-        if (!purchases.length) {
-          return res.sendStatus(200);
+    sensorAddresses = await getSensorAddressesForSensorId(sensorId);
+    if (sensorAddresses !== undefined && sensorAddresses !== []) {
+      for (const sensorAddress of sensorAddresses) {
+        if (!sensor) {
+          console.log(
+            `Could not find sensor ${sensorId}, possible race condition`
+          );
+          return res.status(404).send(`Could not find sensor ${sensorId}`);
         }
-        for (const purchase of purchases) {
-          if (isSubscriptionValid(purchase) && isSubscribed(purchase)) {
-            await sendSensorUpdate(
-              purchase.email,
-              sensor,
-              getSensorIdByAddress(sensorAddress)
-            );
+
+        let purchases: IPurchase[];
+        try {
+          purchases = await getSensorPurchasesForSensorKey(sensorAddress);
+        } catch (error) {
+          return res.sendStatus(424); // Failed Dependency
+        }
+
+        if (purchases) {
+          if (!purchases.length) {
+            return res.sendStatus(200);
           }
+          for (const purchase of purchases) {
+            if (isSubscriptionValid(purchase) && isSubscribed(purchase)) {
+              await sendSensorUpdate(
+                purchase.email,
+                sensor,
+                getSensorIdByAddress(sensorAddress)
+              );
+            }
+          }
+          console.log(`${sensorId} succesfully executed!`);
+          return res.status(200);
         }
-        console.log(`${sensorId} succesfully executed!`);
-        return res.sendStatus(200);
       }
+      res.status(200);
+    } else {
+      res.sendStatus(404);
     }
   } catch (error) {
-    console.error(error);
+    res.status(404).send(error);
   }
 }
 

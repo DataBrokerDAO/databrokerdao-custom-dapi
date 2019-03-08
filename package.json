@@ -26,6 +26,8 @@
     "validator": "^10.11.0"
   },
   "scripts": {
+    "start-debug": "node --trace-warnings --inspect=0.0.0.0:9230 --preserve-symlinks ./dist/server.js",
+    "start-debug-break": "node --trace-warnings --inspect-brk=0.0.0.0:9230 --preserve-symlinks ./dist/server.js",
     "build-ts": "tsc --declaration",
     "watch": "tsc -w --declaration",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -36,7 +38,7 @@
     "semantic-release": "semantic-release",
     "prepublishOnly": "docker build --build-arg NPM_TOKEN=${NPM_TOKEN} -t settlemint/mint -t settlemint/mint-dapi .",
     "uglifyjs": "uglifyjs-folder ./dist -yeo ./dist -x .js",
-    "start": "ts-node src/server.ts",
+    "start": "node ./dist/server.js",
     "dev": "ts-node-dev src/server.ts",
     "loadfixtures": "node dist/fixtures.js",
     "travis-deploy-once": "travis-deploy-once --pro",

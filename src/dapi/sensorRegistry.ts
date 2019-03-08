@@ -11,9 +11,10 @@ const sensorAddressToId: { [index: string]: string } = {};
 export async function getSensorAddressesForSensorId(
   sensorId: string
 ): Promise<string[]> {
-  return sensorIdToAddress[sensorId]
+  const sensorAddress = sensorIdToAddress[sensorId]
     ? Object.keys(sensorIdToAddress[sensorId])
     : querySensorAddressById(sensorId);
+  return sensorAddress;
 }
 
 export async function updateSensorAddresses() {
@@ -52,10 +53,6 @@ async function querySensorAddressById(sensorId: string) {
 
 // This will already be stored by updateSensorAddresses or querySensorAddressById
 export function getSensorIdByAddress(sensorAddress: string) {
-  console.log(
-    sensorAddressToId[sensorAddress.toLocaleLowerCase()],
-    sensorAddressToId
-  );
   return sensorAddressToId[sensorAddress.toLocaleLowerCase()];
 }
 

@@ -13,6 +13,7 @@ export async function subscribe(email: string, sensorid: string) {
 
 export async function unsubscribe(email: string, sensorid: string) {
   const collection = await getCollection('mailregistry');
+  console.log(sensorid);
   if (sensorid) {
     await collection.updateOne(
       {
@@ -38,14 +39,4 @@ export async function unsubscribe(email: string, sensorid: string) {
       }
     );
   }
-}
-
-export async function isSubscribed(email: string, sensorid: string) {
-  const collection = await getCollection('mailregistry');
-  const record = await collection.findOne({
-    email,
-    sensorid,
-    status: 'subscribed'
-  });
-  return typeof record !== 'undefined' && record !== null;
 }

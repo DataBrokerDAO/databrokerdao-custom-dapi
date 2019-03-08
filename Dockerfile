@@ -10,6 +10,7 @@ ARG NPM_TOKEN
 COPY .npmrc .npmrc
 
 RUN npm i -g node-gyp
+RUN npm i -g typescript
 
 RUN mkdir -p /srv
 WORKDIR /srv
