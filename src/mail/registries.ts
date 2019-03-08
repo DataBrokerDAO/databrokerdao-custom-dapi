@@ -13,7 +13,6 @@ export async function subscribe(email: string, sensorid: string) {
 
 export async function unsubscribe(email: string, sensorid: string) {
   const collection = await getCollection('mailregistry');
-  console.log(sensorid);
   if (sensorid) {
     await collection.updateOne(
       {
