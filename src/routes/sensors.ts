@@ -6,7 +6,7 @@ import {
 } from '../dapi/sensorRegistry';
 import { sendSensorUpdate } from '../mail/sensorupdate';
 import { getCollection } from '../services/mongo/client';
-import { IPurchase, ISensor } from '../types/types';
+import { IPurchase, ISensor } from '../types';
 
 export async function sensorDataRoute(req: Request, res: Response) {
   try {

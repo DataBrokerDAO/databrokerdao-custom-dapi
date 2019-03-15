@@ -1,7 +1,7 @@
 import { isEmail } from 'validator';
 import { sendSensorPurchaseRegistered } from '../../dapi/purchaseRegistry';
 import { getSensorIdByAddress } from '../../dapi/sensorRegistry';
-import { IPurchase, IRawPurchase, ISubscriber } from '../../types/types';
+import { IPurchase, IRawPurchase, ISubscriber } from '../../types';
 import { getCollection } from './client';
 
 export async function getMailSubscribersBySensor(

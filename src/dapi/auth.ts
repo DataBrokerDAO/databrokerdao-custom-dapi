@@ -1,17 +1,15 @@
 import axios from 'axios';
-import {
-  DATABROKER_DAPI_PASSWORD,
-  DATABROKER_DAPI_USERNAME
-} from '../config/dapi-config';
+import ConfigService from '../services/ConfigService';
 
 let authToken: string;
+const configService = ConfigService.init();
 
 export async function authenticate() {
   try {
     if (!authenticated()) {
       const response = await axios.post(`/v1/users/authenticate`, {
-        username: DATABROKER_DAPI_USERNAME,
-        password: DATABROKER_DAPI_PASSWORD
+        username: configService.getVariable('DATABROKER_DAPI_USERNAME'),
+        password: configService.getVariable('DATABROKER_DAPI_PASSWORD')
       });
       authToken = response.data.jwtToken;
       axios.defaults.headers.common.Authorization = authToken;

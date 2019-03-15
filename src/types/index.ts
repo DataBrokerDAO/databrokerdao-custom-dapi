@@ -54,3 +54,26 @@ export interface ISubscriber {
   sensorid: string;
   status: string;
 }
+
+export interface IEnvironmentValidators {
+  name: string;
+  validator: ((...args: any[]) => boolean) | RegExp;
+}
+
+export type EnvironmentVariable =
+  | 'DATABROKER_DAPI_BASE_URL'
+  | 'DATABROKER_DAPI_PASSWORD'
+  | 'DATABROKER_DAPI_USERNAME'
+  | 'DATABROKER_DAPP_BASE_URL'
+  | 'MIDDLEWARE_PORT'
+  | 'MIDDLEWARE_URL'
+  | 'MONGO_DB_NAME'
+  | 'MONGO_DB_URL'
+  | 'NODE_ENV'
+  | 'SENDGRID_API_KEY'
+  | 'SENDGRID_FROM_EMAIL'
+  | 'SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS'
+  | 'SENDGRID_TEMPLATE_SLUG_SENSOR_REGISTRATION'
+  | 'SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE';
+
+export type Environment = { [K in EnvironmentVariable]: string };

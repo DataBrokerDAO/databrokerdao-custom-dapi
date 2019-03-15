@@ -1,4 +1,4 @@
-import { IDapiSensor, IPurchase, IRawPurchase } from '../types/types';
+import { IDapiSensor, IPurchase, IRawPurchase } from '../types';
 
 export function transformSensorsToSensorsIdDict(sensors: IDapiSensor[]) {
   const sensorIdDict = {};
@@ -8,9 +8,7 @@ export function transformSensorsToSensorsIdDict(sensors: IDapiSensor[]) {
   return sensorIdDict;
 }
 
-export function transformSensorPurchasesToSensorKeyPurchasesDict(
-  purchases: IRawPurchase[]
-) {
+export function transformPurchasesToPurchasesDict(purchases: IRawPurchase[]) {
   const sensorPurchases = {};
   for (const sensorPurchase of purchases) {
     if (sensorPurchases[sensorPurchase.sensor] === undefined) {
@@ -27,9 +25,7 @@ export function transformSensorPurchasesToSensorKeyPurchasesDict(
   return sensorPurchases;
 }
 
-export function transformSensorPurchasesToSensorPurchasesArray(
-  purchases: IRawPurchase[]
-) {
+export function transformPurchasesToPurchasesArray(purchases: IRawPurchase[]) {
   const newPurchases = [];
   for (const purchase of purchases) {
     const newPurchase: IPurchase = {

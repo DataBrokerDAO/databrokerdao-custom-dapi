@@ -1,11 +1,11 @@
-import {
-  DELIMITER_HASH,
-  MIDDLEWARE_URL,
-  SENDGRID_FROM_EMAIL,
-  SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE
-} from '../config/dapi-config';
-import { ISensor } from '../types/types';
+// tslint:disable-next-line:no-var-requires
+require('dotenv').config();
+import { DELIMITER_HASH } from '../config/dapi-config';
+import ConfigService from '../services/ConfigService';
+import { ISensor } from '../types';
 import { sendUpdate } from './mailer';
+
+const configService = ConfigService.init();
 
 export async function sendSensorUpdate(
   email: string,
@@ -14,10 +14,10 @@ export async function sendSensorUpdate(
 ) {
   const attachments = CreateSensorUpdateAttachment(sensor);
   sendUpdate(
-    SENDGRID_FROM_EMAIL,
+    configService.getVariable('SENDGRID_FROM_EMAIL'),
     email,
     'Sensor update',
-    SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE,
+    configService.getVariable('SENDGRID_TEMPLATE_SLUG_SENSOR_UPDATE'),
     {
       sensor_name: sensor.key,
       current_year: 2019,
@@ -54,12 +54,16 @@ function getUnsubscribeSingleUrl(
   const unsubscribeHash = Buffer.from(
     `${email}${DELIMITER_HASH}${sensorAddress}`
   ).toString('base64');
-  const unsubscribeUrl = `${MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
+  const unsubscribeUrl = `${configService.getVariable(
+    'MIDDLEWARE_URL'
+  )}/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }
 
 function getUnsubscribeAllUrl(email: string) {
   const unsubscribeHash = Buffer.from(email).toString('base64');
-  const unsubscribeUrl = `${MIDDLEWARE_URL}/unsubscribe?hash=${unsubscribeHash}`;
+  const unsubscribeUrl = `${configService.getVariable(
+    'MIDDLEWARE_URL'
+  )}/unsubscribe?hash=${unsubscribeHash}`;
   return unsubscribeUrl;
 }

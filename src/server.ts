@@ -3,18 +3,18 @@ import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import bodyParser = require('body-parser');
 import { CronJob } from 'cron';
 import express from 'express';
-import {
-  DATABROKER_DAPI_BASE_URL,
-  MIDDLEWARE_PORT,
-  SENDGRID_API_KEY
-} from './config/dapi-config';
 import { authenticate } from './dapi/auth';
 import { updateSensorPurchases } from './dapi/purchaseRegistry';
 import { updateSensorAddresses } from './dapi/sensorRegistry';
 import { unsubscribeRoute } from './mail/unsubscribe';
 import { sensorDataRoute } from './routes/sensors';
+import ConfigService from './services/ConfigService';
 
 export const app = express();
+const configService = ConfigService.init();
+const dapiBaseUrl = configService.getVariable('DATABROKER_DAPI_BASE_URL');
+const sendGridApiKey = configService.getVariable('SENDGRID_API_KEY');
+const middlewarePort = configService.getVariable('MIDDLEWARE_PORT');
 
 app.use(bodyParser.json());
 
@@ -22,19 +22,19 @@ app.get('/debug', (req, res, next) => {
   res.send('Running').status(200);
 });
 
-app.post('/sensor/data', sensorDataRoute);
+app.post('/sensorupdate', sensorDataRoute);
 
 app.get('/unsubscribe', unsubscribeRoute);
 
 function bootstrap() {
-  app.listen(MIDDLEWARE_PORT, () => {
-    console.log(`Listening on port ${MIDDLEWARE_PORT}`);
+  app.listen(middlewarePort, () => {
+    console.log(`Listening on port ${middlewarePort}`);
   });
 }
 
 async function init() {
-  axios.defaults.baseURL = DATABROKER_DAPI_BASE_URL;
-  sendgridSetApiKey(SENDGRID_API_KEY);
+  axios.defaults.baseURL = dapiBaseUrl;
+  sendgridSetApiKey(sendGridApiKey);
   await authenticate();
   await updateSensorAddresses();
   await updateSensorPurchases();

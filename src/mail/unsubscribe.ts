@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import validator = require('validator');
-import {
-  DATABROKER_DAPP_BASE_URL,
-  DELIMITER_HASH
-} from '../config/dapi-config';
+import { DELIMITER_HASH } from '../config/dapi-config';
+import ConfigService from '../services/ConfigService';
 import { unsubscribe } from './registries';
 import { validateUnsubscribe } from './validate';
+
+const configService = ConfigService.init();
 
 export async function unsubscribeRoute(req: Request, res: Response) {
   const hash = Buffer.from(req.query.hash, 'base64').toString('utf8');
@@ -23,7 +23,9 @@ export async function unsubscribeRoute(req: Request, res: Response) {
   try {
     validateUnsubscribe(parts, res);
     await unsubscribe(email, sensorid);
-    const unsubscribedUrl = `${DATABROKER_DAPP_BASE_URL}/unsubscribed`;
+    const unsubscribedUrl = `${configService.getVariable(
+      'DATABROKER_DAPP_BASE_URL'
+    )}/unsubscribed`;
     res.redirect(unsubscribedUrl);
   } catch (error) {
     res.send(error).status(200);

@@ -1,16 +1,15 @@
 import axios from 'axios';
-import {
-  SENDGRID_FROM_EMAIL,
-  SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS
-} from '../config/dapi-config';
 import { sendPurchased } from '../mail/mailer';
+import ConfigService from '../services/ConfigService';
 import { addNotSubscribedUsersToDb } from '../services/mongo/store';
-import { IPurchase, IRawPurchase, ISubscriber } from '../types/types';
+import { IPurchase, IRawPurchase, ISubscriber } from '../types';
 import {
-  transformSensorPurchasesToSensorKeyPurchasesDict,
-  transformSensorPurchasesToSensorPurchasesArray
-} from '../util/transform';
+  transformPurchasesToPurchasesArray,
+  transformPurchasesToPurchasesDict
+} from '../utils/transform';
 import { getSensorIdByAddress } from './sensorRegistry';
+
+const configService = ConfigService.init();
 
 let purchaseDictionary: { [index: string]: IPurchase[] } = {};
 let purchaseCount = 0;
@@ -19,9 +18,7 @@ export async function updateSensorPurchases() {
   const data = await getSensorPurchases();
   if (purchaseCount < data.total) {
     const sensorPurchases = data.items;
-    purchaseDictionary = transformSensorPurchasesToSensorKeyPurchasesDict(
-      sensorPurchases
-    );
+    purchaseDictionary = transformPurchasesToPurchasesDict(sensorPurchases);
     purchaseCount = data.total;
     addNotSubscribedUsersToDb(purchaseDictionary);
   }
@@ -42,9 +39,7 @@ export async function getSensorPurchasesForSensorKey(sensorId: string) {
   try {
     const response = await axios.get(buildSensorKeyUrl(sensorId));
     const purchases: IRawPurchase[] = response.data.items;
-    const newPurchases = transformSensorPurchasesToSensorPurchasesArray(
-      purchases
-    );
+    const newPurchases = transformPurchasesToPurchasesArray(purchases);
     return newPurchases;
   } catch (error) {
     throw error;
@@ -59,12 +54,12 @@ export async function sendSensorPurchaseRegistered(
   sensorPurchase: IRawPurchase
 ) {
   sendPurchased(
-    SENDGRID_FROM_EMAIL,
+    configService.getVariable('SENDGRID_FROM_EMAIL'),
     sensorPurchase.email,
     `You successfully purchased '${getSensorIdByAddress(
       sensorPurchase.sensor
     )}'`,
-    SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS,
+    configService.getVariable('SENDGRID_TEMPLATE_SLUG_DATASET_CREDENTIALS'),
     {
       sensor_name: getSensorIdByAddress(sensorPurchase.sensor),
       current_year: 2019,

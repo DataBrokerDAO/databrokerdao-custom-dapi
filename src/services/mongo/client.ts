@@ -1,5 +1,7 @@
 import { Db, MongoClient } from 'mongodb';
-import { MONGO_DB_NAME, MONGO_DB_URL } from '../../config/dapi-config';
+import ConfigService from '../ConfigService';
+
+const configService = ConfigService.init();
 
 let client: MongoClient;
 let db: Db;
@@ -11,10 +13,13 @@ async function init() {
 async function connect() {
   if (!client) {
     try {
-      client = await MongoClient.connect(MONGO_DB_URL, {
-        sslValidate: true
-      });
-      db = await client.db(MONGO_DB_NAME);
+      client = await MongoClient.connect(
+        configService.getVariable('MONGO_DB_URL'),
+        {
+          sslValidate: true
+        }
+      );
+      db = await client.db(configService.getVariable('MONGO_DB_NAME'));
     } catch (error) {
       console.error(error);
       throw error;

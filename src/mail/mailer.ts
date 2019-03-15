@@ -4,7 +4,7 @@ import {
 } from '@sendgrid/mail';
 
 import { AttachmentData } from '@sendgrid/helpers/classes/attachment';
-import { ITemplateData } from '../types/types';
+import { ITemplateData } from '../types';
 
 export async function sendUpdate(
   from: string,
