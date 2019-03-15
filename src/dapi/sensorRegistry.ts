@@ -53,7 +53,7 @@ async function querySensorAddressById(sensorId: string) {
 
 // This will already be stored by updateSensorAddresses or querySensorAddressById
 export function getSensorIdByAddress(sensorAddress: string) {
-  return sensorAddressToId[sensorAddress.toLocaleLowerCase()];
+  return sensorAddressToId[sensorAddress.toLowerCase()];
 }
 
 async function getSensors() {

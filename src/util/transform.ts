@@ -1,11 +1,11 @@
 import { IDapiSensor, IPurchase, IRawPurchase } from '../types/types';
 
-export function transformSensorsToSensorsIdKeyPair(sensors: IDapiSensor[]) {
-  const sensorIdKeyPair = {};
+export function transformSensorsToSensorsIdDict(sensors: IDapiSensor[]) {
+  const sensorIdDict = {};
   for (const sensor of sensors) {
-    sensorIdKeyPair[sensor.sensorid] = sensor.contractAddress;
+    sensorIdDict[sensor.sensorid] = sensor.contractAddress;
   }
-  return sensorIdKeyPair;
+  return sensorIdDict;
 }
 
 export function transformSensorPurchasesToSensorKeyPurchasesDict(

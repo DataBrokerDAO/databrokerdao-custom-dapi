@@ -7,13 +7,9 @@ import { getCollection } from './client';
 export async function getMailSubscribersBySensor(
   purchaseKey: string
 ): Promise<ISubscriber[]> {
-  try {
-    const collection = await getCollection('mailRegistry');
-    const purchases = await collection.find({ key: purchaseKey });
-    return purchases.toArray();
-  } catch (error) {
-    throw error;
-  }
+  const collection = await getCollection('mailRegistry');
+  const purchases = await collection.find({ key: purchaseKey });
+  return purchases.toArray();
 }
 
 export async function addNotSubscribedUsersToDb(purchaseDict: {
@@ -30,14 +26,14 @@ async function verifySubscription(sensorPurchase: IRawPurchase) {
   if (isEmail(sensorPurchase.email)) {
     const subscriptionDocument = await mailRegistry.findOne({
       email: sensorPurchase.email,
-      sensorid: getSensorIdByAddress(sensorPurchase.sensor.toLocaleLowerCase())
+      sensorid: getSensorIdByAddress(sensorPurchase.sensor.toLowerCase())
     });
     if (subscriptionDocument == null) {
       mailRegistry.insertOne({
         email: sensorPurchase.email,
         status: 'subscribed',
         sensorid: getSensorIdByAddress(
-          sensorPurchase.sensor.toLocaleLowerCase()
+          sensorPurchase.sensor.toLowerCase()
         )
       });
       sendSensorPurchaseRegistered(sensorPurchase);
