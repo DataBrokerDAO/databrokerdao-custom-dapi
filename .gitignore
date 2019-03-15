@@ -7,3 +7,4 @@ coverage.json
 .DS_Store
 ./test
 .env
+/dist
