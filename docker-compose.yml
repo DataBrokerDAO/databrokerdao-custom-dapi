@@ -9,3 +9,4 @@ services:
       - ./data/mongodb:/data/db
     command: mongod --smallfiles
     restart: always
+  

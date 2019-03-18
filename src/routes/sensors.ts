@@ -28,37 +28,41 @@ export async function sensorDataRoute(req: Request, res: Response) {
           );
           return res.status(404).send(`Could not find sensor ${sensorId}`);
         }
-
         let purchases: IPurchase[];
         try {
           purchases = await getSensorPurchasesForSensorKey(sensorAddress);
         } catch (error) {
           return res.sendStatus(424); // Failed Dependency
         }
-
         if (purchases) {
           if (!purchases.length) {
             return res.sendStatus(200);
           }
           for (const purchase of purchases) {
-            if (isSubscriptionValid(purchase) && isSubscribed(purchase)) {
-              await sendSensorUpdate(
-                purchase.email,
-                sensor,
-                getSensorIdByAddress(sensorAddress)
-              );
+            try {
+              if (isSubscriptionValid(purchase) && isSubscribed(purchase)) {
+                await sendSensorUpdate(
+                  purchase.email,
+                  sensor,
+                  getSensorIdByAddress(sensorAddress)
+                ).catch(error => {
+                  console.error(error);
+                });
+              }
+            } catch (error) {
+              console.error(error);
             }
           }
           console.log(`${sensorId} succesfully executed!`);
-          return res.status(200);
+          return res.sendStatus(200);
         }
       }
-      res.status(200);
+      return res.sendStatus(200);
     } else {
-      res.sendStatus(404);
+      return res.sendStatus(404);
     }
   } catch (error) {
-    res.status(404).send(error);
+    return res.status(404).send(error);
   }
 }
 

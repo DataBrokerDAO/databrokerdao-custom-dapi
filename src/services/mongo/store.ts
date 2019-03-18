@@ -32,11 +32,14 @@ async function verifySubscription(sensorPurchase: IRawPurchase) {
       mailRegistry.insertOne({
         email: sensorPurchase.email,
         status: 'subscribed',
-        sensorid: getSensorIdByAddress(
-          sensorPurchase.sensor.toLowerCase()
-        )
+        sensorid: getSensorIdByAddress(sensorPurchase.sensor.toLowerCase())
       });
-      sendSensorPurchaseRegistered(sensorPurchase);
+      if (
+        sensorPurchase.startTime >
+        Math.floor(Date.now() / 1000) - 24 * 3600
+      ) {
+        sendSensorPurchaseRegistered(sensorPurchase);
+      }
     }
   }
 }

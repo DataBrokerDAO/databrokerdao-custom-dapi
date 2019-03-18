@@ -31,7 +31,8 @@ async function getSensorPurchases() {
     );
     return response.data;
   } catch (error) {
-    throw error;
+    console.error('Failed to fetch sensor purchases');
+    return null;
   }
 }
 
@@ -42,7 +43,8 @@ export async function getSensorPurchasesForSensorKey(sensorId: string) {
     const newPurchases = transformPurchasesToPurchasesArray(purchases);
     return newPurchases;
   } catch (error) {
-    throw error;
+    console.error('Failed to fetch sensor purchases');
+    return null;
   }
 }
 

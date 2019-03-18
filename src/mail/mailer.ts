@@ -26,6 +26,7 @@ export async function sendUpdate(
   try {
     await sendGridSend(msg);
   } catch (error) {
+    console.error(`Failed to send sensor update to ${to}`);
     throw error;
   }
 }
@@ -48,6 +49,7 @@ export async function sendPurchased(
   try {
     await sendGridSend(msg);
   } catch (error) {
+    console.error(`Failed to send sensor update to ${to}`);
     throw error;
   }
 }

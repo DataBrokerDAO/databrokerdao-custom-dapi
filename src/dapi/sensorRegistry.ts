@@ -47,7 +47,7 @@ async function querySensorAddressById(sensorId: string) {
       throw new Error('Sensor not found');
     }
   } catch (error) {
-    throw error;
+    throw new Error('Sensor not found');
   }
 }
 
@@ -61,6 +61,7 @@ async function getSensors() {
     const response = await axios.get(`/sensorregistry/list?abi=false`);
     return response.data.items;
   } catch (error) {
+    console.log('Failed to get sensors from sensor registry');
     throw error;
   }
 }

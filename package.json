@@ -20,8 +20,8 @@
     "validator": "^10.11.0"
   },
   "scripts": {
-    "start-debug": "node --trace-warnings --inspect=0.0.0.0:9230 --preserve-symlinks ./dist/server.js",
-    "start-debug-break": "node --trace-warnings --inspect-brk=0.0.0.0:9230 --preserve-symlinks ./dist/server.js",
+    "start-debug": "ts-node-dev --trace-warnings --inspect=0.0.0.0:9230 --preserve-symlinks ./src/server.ts",
+    "start-debug-break": "ts-node-dev --trace-warnings --inspect-brk=0.0.0.0:9230 --preserve-symlinks ./src/server.ts",
     "build-ts": "tsc --declaration",
     "watch": "tsc -w --declaration",
     "tslint": "tslint -c tslint.json -p tsconfig.json",

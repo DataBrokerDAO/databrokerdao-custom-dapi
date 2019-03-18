@@ -1,3 +1,6 @@
+// tslint:disable-next-line:no-var-requires
+require('dotenv').config();
+
 import { setApiKey as sendgridSetApiKey } from '@sendgrid/mail';
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import bodyParser = require('body-parser');
@@ -33,19 +36,23 @@ function bootstrap() {
 }
 
 async function init() {
-  axios.defaults.baseURL = dapiBaseUrl;
-  sendgridSetApiKey(sendGridApiKey);
-  await authenticate();
-  await updateSensorAddresses();
-  await updateSensorPurchases();
+  try {
+    axios.defaults.baseURL = dapiBaseUrl;
+    sendgridSetApiKey(sendGridApiKey);
+    await authenticate();
+    await updateSensorAddresses();
+    await updateSensorPurchases();
 
-  new CronJob(
-    '* */10 * * *',
-    updateSensorPurchases,
-    updateSensorPurchases,
-    true,
-    'Europe/Brussels'
-  ).start();
+    new CronJob(
+      '* */10 * * *',
+      updateSensorPurchases,
+      updateSensorPurchases,
+      true,
+      'Europe/Brussels'
+    ).start();
+  } catch (error) {
+    console.error(`Failed to initialize with error: ${error}`);
+  }
 }
 
 bootstrap();
