@@ -1,0 +1,12 @@
+version: '3.6'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data/mongodb:/data/db
+    command: mongod --smallfiles
+    restart: always
+  
